@@ -6,7 +6,9 @@ const App = () => {
   return (
     <div className="p-4 bg-orange-500 text-white">
       <h1>We did it🩷</h1>
-      <p>Updated to React 18 with createRoot and concurrent rendering</p>
+      <p>
+        Updated to React 18 with createRoot and concurrent rendering new 1111
+      </p>
     </div>
   );
 };
