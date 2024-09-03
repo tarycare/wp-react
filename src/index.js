@@ -1,66 +1,138 @@
-// i want a + button for new document upload when click it will open in table row that have 3 column 1st is upload input file 2nd file type public or private 3d mdoule type dropdown list that have 3 options 1st Employee 2nd Customer 3rd Vendor , i can add multiple row and when i click on New Document button it will add new row in table and make style by tailwind css
-// i want a - button for delete row when click it will delete that row
-// i want a save button when click it will save all data in table in json format and show in console
-// i want a clear button when click it will clear all data in table
-
+import { Trash2Icon, PlusCircleIcon } from "lucide-react";
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
+import "./index.css";
 
 const App = () => {
-  const [rows, setRows] = useState([{ id: 1 }]);
+  const [rows, setRows] = useState([
+    { id: 1, file: null, fileType: "public", moduleType: "employee" },
+  ]);
 
   const addRow = () => {
-    setRows([...rows, { id: rows.length + 1 }]);
+    setRows([
+      ...rows,
+      {
+        id: rows.length + 1,
+        file: null,
+        fileType: "public",
+        moduleType: "employee",
+      },
+    ]);
   };
 
   const deleteRow = (id) => {
     setRows(rows.filter((row) => row.id !== id));
   };
 
-  const saveData = () => {
-    console.log(rows);
-    // fetch post to wordpress api to save data
+  const saveData = async () => {
+    const formData = new FormData();
+
+    rows.forEach((row, index) => {
+      if (row.file) {
+        formData.append(`file_${index}`, row.file);
+      }
+      formData.append(`doc_type_${index}`, row.fileType);
+      formData.append(`module_type_${index}`, row.moduleType);
+    });
+
+    try {
+      const response = await fetch("/wp-json/doc/v1/add", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error("Error uploading data:", error);
+    }
   };
 
   const clearData = () => {
     setRows([]);
   };
 
+  const handleChange = (id, field, value) => {
+    setRows(
+      rows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
+  };
+
   return (
-    <div>
-      <button onClick={addRow}>New Document</button>
-      <button onClick={saveData}>Save</button>
-      <button onClick={clearData}>Clear</button>
-      <table className="border border-1 border-black">
+    <div className="container mx-auto p-4">
+      <div className="mb-4 space-x-2">
+        <button
+          onClick={addRow}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center mb-2"
+        >
+          <PlusCircleIcon className="mr-2" /> New Document
+        </button>
+        <button
+          onClick={saveData}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Save
+        </button>
+        <button
+          onClick={clearData}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Clear
+        </button>
+      </div>
+      <table className="min-w-full bg-white border border-gray-200 shadow-md">
         <thead>
-          <tr>
-            <th>Upload Input File</th>
-            <th>File Type</th>
-            <th>Module Type</th>
-            <th>Action</th>
+          <tr className="bg-gray-100 text-left">
+            <th className="p-2 border">Upload Input File</th>
+            <th className="p-2 border">File Type</th>
+            <th className="p-2 border">Module Type</th>
+            <th className="p-2 border">Action</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td>
-                <input type="file" />
+              <td className="p-2 border">
+                <input
+                  type="file"
+                  onChange={(e) =>
+                    handleChange(row.id, "file", e.target.files[0])
+                  }
+                  className="file-input"
+                />
               </td>
-              <td>
-                <select>
+              <td className="p-2 border">
+                <select
+                  value={row.fileType}
+                  onChange={(e) =>
+                    handleChange(row.id, "fileType", e.target.value)
+                  }
+                  className="form-select"
+                >
                   <option value="public">Public</option>
                   <option value="private">Private</option>
                 </select>
               </td>
-              <td>
-                <select>
+              <td className="p-2 border">
+                <select
+                  value={row.moduleType}
+                  onChange={(e) =>
+                    handleChange(row.id, "moduleType", e.target.value)
+                  }
+                  className="form-select"
+                >
                   <option value="employee">Employee</option>
                   <option value="customer">Customer</option>
                   <option value="vendor">Vendor</option>
                 </select>
               </td>
-              <td>
-                <button onClick={() => deleteRow(row.id)}>-</button>
+              <td className="p-2 border">
+                <button
+                  onClick={() => deleteRow(row.id)}
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                >
+                  <Trash2Icon />
+                </button>
               </td>
             </tr>
           ))}
@@ -72,11 +144,9 @@ const App = () => {
 
 export default App;
 
-// Get the DOM element where your app will be rendered
 const rootElement = document.getElementById("wp-react-app");
 
 if (rootElement) {
-  // Use createRoot instead of ReactDOM.render
   const root = ReactDOM.createRoot(rootElement);
   root.render(<App />);
 }

@@ -1,11 +1,7 @@
 <?php
 
-/**
- * This file will create Custom Rest API End Points.
- */
 class WP_React_Settings_Rest_Route
 {
-
     public function __construct()
     {
         add_action('rest_api_init', [$this, 'create_rest_routes']);
@@ -13,63 +9,70 @@ class WP_React_Settings_Rest_Route
 
     public function create_rest_routes()
     {
-        register_rest_route('wprk/v1', '/settings', [
-            'methods' => 'GET',
-            'callback' => [$this, 'get_settings'],
-            'permission_callback' => [$this, 'get_settings_permission']
-        ]);
         register_rest_route('doc/v1', '/add', [
             'methods' => 'POST',
             'callback' => [$this, 'add_doc'],
-            'permission_callback' => [$this, 'save_settings_permission']
+            'permission_callback' => '__return_true' // Allows access for all authenticated users
         ]);
-    }
-
-    public function get_settings()
-    {
-        $firstname = get_option('wprk_settings_firstname');
-        $lastname  = get_option('wprk_settings_lastname');
-        $email     = get_option('wprk_settings_email');
-        $response = [
-            'firstname' => $firstname,
-            'lastname'  => $lastname,
-            'email'     => $email
-        ];
-
-        return rest_ensure_response($response);
-    }
-
-    public function get_settings_permission()
-    {
-        return true;
     }
 
     public function add_doc($req)
     {
+        $files = $_FILES;
+        $responses = [];
 
-        // it will uplade custom post type image_url doc_type moudle_type
+        foreach ($files as $key => $file) {
+            if (!isset($file['name']) || !$file['name']) {
+                $responses[] = ['error' => true, 'message' => 'File name is missing or invalid.'];
+                continue;
+            }
 
-        $request = json_decode($req->get_body());
-        $doc_type = $request->doc_type;
-        $moudle_type = $request->moudle_type;
-        $image_url = $request->image_url;
-        $post_id = wp_insert_post(array(
-            'post_title' => $doc_type,
-            'post_content' => $moudle_type,
-            'post_status' => 'publish',
-            'post_type' => 'doc',
-        ));
-        if ($post_id) {
-            update_post_meta($post_id, 'image_url', $image_url);
-            return rest_ensure_response('Document Added Successfully');
-        } else {
-            return rest_ensure_response('Error in Adding Document');
+            $attachment_id = $this->upload_file_to_media_library($key, $file);
+            if (is_wp_error($attachment_id)) {
+                $responses[] = ['error' => true, 'message' => $attachment_id->get_error_message()];
+                continue;
+            }
+
+            $doc_type = sanitize_text_field($req->get_param('doc_type_' . str_replace('file_', '', $key)));
+            $module_type = sanitize_text_field($req->get_param('module_type_' . str_replace('file_', '', $key)));
+
+            $post_id = wp_insert_post([
+                'post_title' => $doc_type ?: 'Untitled Document',
+                'post_content' => $module_type,
+                'post_status' => 'publish',
+                'post_type' => 'doc',
+            ]);
+
+            if ($post_id) {
+                update_post_meta($post_id, 'attachment_id', $attachment_id);
+                $responses[] = ['error' => false, 'message' => 'Document added successfully', 'post_id' => $post_id];
+            } else {
+                $responses[] = ['error' => true, 'message' => 'Failed to create document post.'];
+            }
         }
+
+        return rest_ensure_response($responses);
     }
 
-    public function save_settings_permission()
+    private function upload_file_to_media_library($key, $file)
     {
-        return current_user_can('publish_posts');
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return new WP_Error('upload_error', 'Error uploading file: ' . $file['error']);
+        }
+
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+
+        $overrides = ['test_form' => false];
+        $attachment_id = media_handle_upload($key, 0, $overrides);  // Correct key is used
+
+        if (is_wp_error($attachment_id)) {
+            return $attachment_id; // Return any upload errors
+        }
+
+        return $attachment_id;
     }
 }
+
 new WP_React_Settings_Rest_Route();
