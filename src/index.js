@@ -6,6 +6,10 @@ const App = () => {
   return (
     <div className="p-4 bg-orange-500 text-white">
       <h1>We did it🩷</h1>
+      <p>
+        This is a simple React app that is served by a local development server
+        and proxies requests to a local WordPress installation.
+      </p>
     </div>
   );
 };
