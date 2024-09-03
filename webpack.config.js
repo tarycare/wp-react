@@ -6,12 +6,12 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
-    publicPath: "/dist/", // Ensure this matches the folder where your assets are served
+    publicPath: "/dist/",
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -23,31 +23,34 @@ module.exports = {
       },
     ],
   },
+  resolve: {
+    extensions: [".js", ".jsx"],
+    alias: {
+      "@": path.resolve(__dirname, "src"), // Alias for root 'src' directory
+    },
+  },
   plugins: [
     new MiniCssExtractPlugin({
       filename: "style.css",
     }),
   ],
-  resolve: {
-    extensions: [".js", ".jsx"],
-  },
   devServer: {
     static: {
-      directory: path.join(__dirname), // Serve content from the root of your project
-      watch: true, // Enable watching of static files
+      directory: path.join(__dirname),
+      watch: true,
     },
-    hot: true, // Enable hot reloading
-    port: 8080, // The port where your dev server will run
+    hot: true,
+    port: 8080,
     proxy: [
       {
-        context: ["/wp-json", "/wp-admin"], // Define the contexts to proxy
-        target: "http://localhost:8000", // Proxy to your local WordPress installation
+        context: ["/wp-json", "/wp-admin"],
+        target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
       },
     ],
     headers: {
-      "Access-Control-Allow-Origin": "*", // To avoid CORS issues
+      "Access-Control-Allow-Origin": "*",
     },
   },
   mode: "development",
