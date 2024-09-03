@@ -7,6 +7,11 @@
  * Version: 1.0.2
  * Description: WordPress React KickOff.
  * Text-Domain: wp-react-kickoff
+ * GitHub Plugin URI: abusiraj84/wp-react
+ * GitHub Plugin URI: https://github.com/abusiraj84/wp-react
+ * Primary Branch: main
+
+
  */
 
 if (! defined('ABSPATH')) : exit();
