@@ -4,11 +4,9 @@ import "./style.css";
 
 const App = () => {
   return (
-    <div className="p-4 bg-orange-500 text-white">
-      <h1>We did it🩷</h1>
-      <p>
-        Updated to React 18 with createRoot and concurrent rendering new 1111
-      </p>
+    <div className="bg-white size-[800px] rounded-md p-2">
+      <h1 className="text-2xl font-bold text-center">Hello World</h1>
+      <p className="text-center">This is a React app in WordPress</p>
     </div>
   );
 };
