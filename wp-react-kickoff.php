@@ -4,7 +4,7 @@
  * Plugin Name: WP React KickOff
  * Author: Husam nasrallah
  * Author URI: https://github.com/robicse11127
- * Version: 1.0.1
+ * Version: 1.0.2
  * Description: WordPress React KickOff.
  * Text-Domain: wp-react-kickoff
  */
