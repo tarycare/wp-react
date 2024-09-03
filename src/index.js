@@ -4,8 +4,8 @@ import "./style.css";
 
 const App = () => {
   return (
-    <div className="p-4 bg-blue-500 text-white">
-      <h1>Hello, React 18 with Tailwind CSS!</h1>
+    <div className="p-4 bg-orange-500 text-white">
+      <h1>We did it🩷</h1>
     </div>
   );
 };
