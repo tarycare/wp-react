@@ -18,8 +18,8 @@ class WPRK_Create_Admin_Page
         $slug = 'wprk-settings';
 
         add_menu_page(
-            __('WP React KickOff', 'wp-react-kickoff'),
-            __('WP React KickOff', 'wp-react-kickoff'),
+            __('WP React KickOff', 'wp-react'),
+            __('WP React KickOff', 'wp-react'),
             $capability,
             $slug,
             [$this, 'menu_page_template'],
