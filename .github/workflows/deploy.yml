@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main # Or whichever branch you want to trigger on
+      - staging # Workflow triggers on push to staging branch
 
 jobs:
   build:
@@ -59,7 +59,7 @@ jobs:
             echo "::set-output name=production_exists::false"
           fi
 
-      # Step 9: Conditionally push to staging or production
+      # Step 9: Conditionally push to production
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
           if [ "${{ steps.production-check.outputs.production_exists }}" = "true" ]; then
             echo "Pushing to staging branch."
             git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
-            git push origin HEAD:staging --force
+            git push origin staging --force
           else
             echo "Pushing directly to production branch."
             git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
