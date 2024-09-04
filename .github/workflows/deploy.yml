@@ -54,12 +54,20 @@ jobs:
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git push origin HEAD:staging --force
 
-      # Step 8: Create a pull request from staging to master
+      # Step 8: Check if master exists, and create if not
+      - name: Check and create master branch if it doesn't exist
+        run: |
+          if ! git ls-remote --exit-code --heads origin master; then
+            git checkout -b master main
+            git push origin master
+          fi
+
+      # Step 9: Create a pull request from staging to master
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          base: master # Base branch where you want the PR to be opened (e.g., master)
-          head: staging # Source branch (staging)
+          base: master # Base branch where you want the PR to be opened (master)
+          branch: staging # Source branch (staging)
           title: "Pull request from staging to master"
           body: "This is an automated pull request created after a successful build and deployment to staging."
