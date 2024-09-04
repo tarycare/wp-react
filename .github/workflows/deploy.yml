@@ -1,7 +1,11 @@
 on:
   push:
     branches:
-      - staging # Workflow triggers on push to staging branch
+      - staging # Ensure you are pushing to the 'staging' branch
+
+permissions:
+  contents: write
+  workflows: write
 
 jobs:
   build:
