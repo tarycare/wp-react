@@ -47,32 +47,23 @@ jobs:
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 8: Fetch all branches from the remote
+      # Step 8: Fetch all remote branches
       - name: Fetch all remote branches
         run: |
           git fetch origin
 
-      # Step 9: Check if production branch exists, create it if necessary
-      - name: Check and create production branch if necessary
+      # Step 9: Check if production branch exists and create it from staging if necessary
+      - name: Check and create production branch from staging if necessary
         run: |
           if git show-ref --quiet refs/remotes/origin/production; then
-            git checkout production
+            echo "Production branch exists."
           else
+            git checkout staging
             git checkout -b production
             git push origin production
           fi
 
-      # Step 10: Check if staging branch exists, create it if necessary
-      - name: Check and create staging branch if necessary
-        run: |
-          if git show-ref --quiet refs/remotes/origin/staging; then
-            git checkout staging
-          else
-            git checkout -b staging
-            git push origin staging
-          fi
-
-      # Step 11: Commit and push changes to staging
+      # Step 10: Commit and push changes to staging
       - name: Commit and push changes to staging
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,7 +72,7 @@ jobs:
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git push origin staging --force
 
-      # Step 12: Create a Pull Request from staging to production
+      # Step 11: Create a Pull Request from staging to production
       - name: Create Pull Request to Production
         uses: repo-sync/pull-request@v2
         with:
