@@ -50,4 +50,5 @@ jobs:
         run: |
           git add -A  # Stage all changes, including file deletions
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
-          git push origin HEAD:deployment-branch --force
+          git push origin HEAD:staging --force
+          git push origin HEAD:production --force
