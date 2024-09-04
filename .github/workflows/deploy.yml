@@ -1,5 +1,3 @@
-name: Build and Deploy
-
 on:
   push:
     branches:
@@ -47,37 +45,41 @@ jobs:
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 8: Fetch all remote branches
-      - name: Fetch all remote branches
+      # Step 8: Check if production branch exists and create it if necessary
+      - name: Check and Create production branch if it doesn't exist
+        id: production-check
         run: |
-          git fetch origin
-
-      # Step 9: Check if production branch exists, handle push or PR accordingly
-      - name: Push to production or create PR from staging
-        run: |
-          if git show-ref --quiet refs/remotes/origin/production; then
-            echo "Production branch exists, creating a pull request."
-            exit 0
+          if git show-ref --quiet refs/heads/production; then
+            echo "Production branch exists."
+            echo "::set-output name=production_exists::true"
           else
-            echo "Production branch not found. Pushing staging to production."
-            git checkout staging
+            echo "Production branch does not exist. Creating it."
             git checkout -b production
             git push origin production
-            exit 1
+            echo "::set-output name=production_exists::false"
           fi
 
-      # Step 10: Commit and push changes to staging
-      - name: Commit and push changes to staging
+      # Step 9: Conditionally push to staging or production
+      - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add -A
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
-          git push origin staging --force
 
-      # Step 11: Create a Pull Request from staging to production if production exists
+          if [ "${{ steps.production-check.outputs.production_exists }}" = "true" ]; then
+            echo "Pushing to staging branch."
+            git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
+            git push origin HEAD:staging --force
+          else
+            echo "Pushing directly to production branch."
+            git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
+            git push origin production --force
+          fi
+
+      # Step 10: Create a Pull Request from staging to production (only if production exists)
       - name: Create Pull Request to Production
-        if: success()
+        if: steps.production-check.outputs.production_exists == 'true'
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: production
