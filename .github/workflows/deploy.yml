@@ -20,7 +20,13 @@ jobs:
         with:
           node-version: "18.17.0"
 
-      # Step 3: Push changes from main to staging
+      # Step 3: Configure Git (Set identity for the runner)
+      - name: Configure Git
+        run: |
+          git config --global user.email "abusiraj84@gmail.com"
+          git config --global user.name "abusiraj84"
+
+      # Step 4: Push changes from main to staging
       - name: Push main to staging
         run: |
           git fetch origin
@@ -28,17 +34,11 @@ jobs:
           git pull origin main
           git push origin main:staging --force
 
-      # Step 4: Configure Git for committing in this repository
-      - name: Configure Git
-        run: |
-          git config --global user.email "abusiraj84@gmail.com"
-          git config --global user.name "abusiraj84"
-
-      # Step 5: Check if the master branch exists, create it if it doesn't
+      # Step 5: Check if master branch exists, and create if it doesn't
       - name: Ensure master branch exists without pushing changes
         run: |
           if ! git ls-remote --exit-code --heads origin master; then
-            # Create an orphan branch master with no changes from main or staging
+            # Create an orphan branch for master with no changes from staging
             git checkout --orphan master
             git rm -rf .
             echo "# Master branch" > README.md
