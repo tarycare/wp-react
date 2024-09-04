@@ -1,3 +1,5 @@
+/*! decimal.js-light v2.5.1 https://github.com/MikeMcl/decimal.js-light/LICENCE */
+
 /**
  * @license React
  * react-dom.production.min.js
@@ -38,9 +40,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-/**
- * @license lucide-react v0.438.0 - ISC
+/** @license React v16.13.1
+ * react-is.production.min.js
  *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */

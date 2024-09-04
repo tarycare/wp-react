@@ -11,7 +11,7 @@ const rootElement = document.getElementById("wp-react-app");
 if (rootElement) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <div className="w-[400px]">
+    <div className="">
       <App />
     </div>
   );
