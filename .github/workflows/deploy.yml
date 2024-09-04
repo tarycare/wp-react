@@ -14,13 +14,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Configure Git (Set identity for the runner)
+      # Step 2: Set up Node.js (if needed for your build)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.17.0"
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run the build script
+      - name: Run build
+        run: npm run build
+
+      # Step 5: Configure Git (Set identity for the runner)
       - name: Configure Git
         run: |
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 3: Push main to staging
+      # Step 6: Push main to staging
       - name: Push main to staging
         run: |
           git fetch origin
@@ -28,7 +42,7 @@ jobs:
           git pull origin main
           git push origin main:staging --force
 
-      # Step 4: Trigger second workflow
+      # Step 7: Trigger second workflow
       - name: Trigger pull request workflow
         uses: actions/github-script@v4
         with:
