@@ -54,5 +54,13 @@ jobs:
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git remote set-url origin https://abusiraj84:${{ secrets.GH_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin HEAD:staging --force
-          # open a pull request to production branch
-          gh pr create --base main --head staging --title "Deploy to production" --body "Deploy to production"
+
+      # Step 9: Create a Pull Request from staging to production
+      - name: Create Pull Request to Production
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: production
+          source_branch: staging
+          pr_title: "Deploy from Staging to Production"
+          pr_body: "This is an automated PR to merge staging into production after build and deploy."
+          github_token: ${{ secrets.GH_TOKEN }}
