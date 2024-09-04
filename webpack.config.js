@@ -27,7 +27,7 @@ module.exports = {
         generator: {
           filename: "[name][ext]", // Output without hashes
           publicPath: "/wp-content/plugins/wp-react-kickoff/dist/fonts/", // Correct path for production
-          outputPath: "fonts", // Ensures fonts are placed in dist/fonts
+          outputPath: "/fonts", // Ensures fonts are placed in dist/fonts
         },
       },
     ],
