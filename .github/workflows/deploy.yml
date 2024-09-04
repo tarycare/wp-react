@@ -48,11 +48,11 @@ jobs:
       # Step 8: Commit and push changes
       - name: Commit and push changes
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add -A
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
-          git remote set-url origin https://abusiraj84:${{ secrets.GH_TOKEN }}@github.com/abusiraj84/wp-react.git
+          git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin HEAD:staging --force
 
       # Step 9: Create a Pull Request from staging to production
@@ -63,4 +63,4 @@ jobs:
           source_branch: staging
           pr_title: "Deploy from Staging to Production"
           pr_body: "This is an automated PR to merge staging into production after build and deploy."
-          github_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
