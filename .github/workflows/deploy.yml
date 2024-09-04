@@ -30,32 +30,26 @@ jobs:
       - name: Run build
         run: npm run build
 
-      # Step 5: Remove unnecessary files (excluding dist, classes, and plugin.php)
-      - name: Remove unnecessary files except for dist, classes, and plugin.php
+      # Step 5: Remove unnecessary files (excluding dist, classes, plugin.php, and .git)
+      - name: Remove unnecessary files except for dist, classes, plugin.php, and .git
         run: |
-          find . -mindepth 1 -maxdepth 1 ! -name 'dist' ! -name 'classes' ! -name 'plugin.php' -exec rm -rf {} +
+          find . -mindepth 1 -maxdepth 1 ! -name 'dist' ! -name 'classes' ! -name 'plugin.php' ! -name '.git' -exec rm -rf {} +
 
       # Step 6: Remove the .github folder
       - name: Remove .github folder
         run: rm -rf .github
 
-      # Step 7: Re-checkout the repository to ensure .git is present
-      - name: Re-checkout the repository (if .git is missing)
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Ensure full repo is available
-
-      # Step 8: Configure Git
+      # Step 7: Configure Git
       - name: Configure Git
         run: |
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 9: Fetch all branches
+      # Step 8: Fetch all branches
       - name: Fetch all branches
         run: git fetch --all
 
-      # Step 10: Ensure staging branch exists
+      # Step 9: Ensure staging branch exists
       - name: Ensure staging branch exists
         run: |
           if git show-ref --quiet refs/heads/staging; then
@@ -66,7 +60,7 @@ jobs:
             git push origin staging
           fi
 
-      # Step 11: Check if production branch exists and create it if necessary
+      # Step 10: Check if production branch exists and create it if necessary
       - name: Check and Create production branch if it doesn't exist
         run: |
           if git show-ref --quiet refs/heads/production; then
@@ -78,7 +72,7 @@ jobs:
             git push origin production
           fi
 
-      # Step 12: Commit and push changes to staging
+      # Step 11: Commit and push changes to staging
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -88,7 +82,7 @@ jobs:
           git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin staging --force
 
-      # Step 13: Create a Pull Request from staging to production
+      # Step 12: Create a Pull Request from staging to production
       - name: Create Pull Request to Production
         uses: repo-sync/pull-request@v2
         with:
