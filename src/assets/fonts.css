@@ -1,0 +1,26 @@
+/* src/fonts.css */
+@font-face {
+  font-family: "MyFont";
+  src: url("./fonts/my-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("./fonts/my-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("./fonts/my-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Apply the font globally */
+body {
+  font-family: "MyFont", sans-serif !important;
+}

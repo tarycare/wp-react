@@ -32,8 +32,8 @@ function load_scripts()
 
     if ($is_dev) {
         // Load from Webpack Dev Server
-        wp_enqueue_script('wp-react-kickoff', 'http://localhost:8080/dist/bundle.js', ['jquery', 'wp-element'], wp_rand(), true);
-        wp_enqueue_style('wp-react-kickoff-style', 'http://localhost:8080/dist/style.css', [], wp_rand());
+        wp_enqueue_script('wp-react-kickoff', 'http://localhost:3000/dist/bundle.js', ['jquery', 'wp-element'], wp_rand(), true);
+        wp_enqueue_style('wp-react-kickoff-style', 'http://localhost:3000/dist/style.css', [], wp_rand());
     } else {
         // Load the production bundle from the plugin directory
         wp_enqueue_script('wp-react-kickoff', WPRK_URL . 'dist/bundle.js', ['jquery', 'wp-element'], wp_rand(), true);

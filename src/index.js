@@ -2,7 +2,6 @@ import { Trash2Icon, PlusCircleIcon } from "lucide-react";
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { Button } from "./components/ui/button";
 
 import {
   Sheet,
@@ -12,11 +11,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast";
+// import { Toaster } from "@/components/ui/toaster";
+// import { useToast } from "@/hooks/use-toast";
 
 const App = () => {
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const [rows, setRows] = useState([
     { id: 1, file: null, fileType: "public", moduleType: "employee" },
   ]);
@@ -78,12 +77,12 @@ const App = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 space-x-2">
-        <Toaster />
+        {/* <Toaster /> */}
         {/* sheet */}
+
         <Sheet>
-          <SheetTrigger>
-            <Button>Open Sheet</Button>
-          </SheetTrigger>
+          لا تنسى الاشتراك في القناة
+          <SheetTrigger>Open Sheet</SheetTrigger>
           <SheetContent>
             <SheetHeader className="mt-6">
               <SheetTitle>Are you absolutely sure?</SheetTitle>
@@ -94,7 +93,6 @@ const App = () => {
             </SheetHeader>
           </SheetContent>
         </Sheet>
-
         <button
           onClick={addRow}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center mb-2"

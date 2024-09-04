@@ -21,6 +21,19 @@ module.exports = {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
       },
+      {
+        test: /\.(woff(2)?|eot|ttf|otf|svg)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "fonts",
+              publicPath: "/dist/fonts",
+              name: "[name].[ext]",
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
@@ -35,16 +48,18 @@ module.exports = {
     }),
   ],
   devServer: {
+    historyApiFallback: true,
+    allowedHosts: "all",
     static: {
       directory: path.join(__dirname),
       watch: true,
     },
     hot: true,
-    port: 8080,
+    port: 3000,
     proxy: [
       {
         context: ["/wp-json", "/wp-admin"],
-        target: "http://localhost:8000",
+        target: "https://localhost:3000",
         changeOrigin: true,
         secure: false,
       },
@@ -54,4 +69,9 @@ module.exports = {
     },
   },
   mode: "development",
+
+  // Add stats to get detailed error information
+  stats: {
+    errorDetails: true,
+  },
 };
