@@ -43,13 +43,14 @@ jobs:
           git push origin main:staging --force
 
       # Step 7: Trigger second workflow
-      - name: Trigger pull request workflow
+      - name: Trigger second workflow (create pull request)
         uses: actions/github-script@v4
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'create-pull-request.yml', # The filename of the second workflow
-              ref: 'main'  # Trigger the second workflow on the main branch
+              owner: '${{ github.repository_owner }}',
+              repo: '${{ github.event.repository.name }}',
+              workflow_id: 'create-pull-request.yml',
+              ref: 'main'
             })
