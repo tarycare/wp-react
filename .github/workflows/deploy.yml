@@ -41,7 +41,13 @@ jobs:
           git merge main --no-edit || echo "No changes to merge"
           git push origin staging
 
-      # Step 6: Commit and push changes to staging
+      # Step 6: Check if production branch exists and create from staging if it doesn't
+      - name: Check if production branch exists
+        run: |
+          git fetch origin production:production || git checkout -b production staging
+          git push origin production
+
+      # Step 7: Commit and push changes to staging
       - name: Commit and push changes to staging
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +57,7 @@ jobs:
           git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin HEAD:staging --force
 
-      # Step 7: Create a Pull Request from staging to production
+      # Step 8: Create a Pull Request from staging to production
       - name: Create Pull Request to Production
         uses: repo-sync/pull-request@v2
         with:
