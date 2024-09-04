@@ -113,7 +113,7 @@ jobs:
           git checkout master
           git pull origin master
           git checkout staging
-          git rebase --onto master staging~1 staging
+          git rebase --onto master staging
           git checkout master
           git merge staging
           git push origin master --force
