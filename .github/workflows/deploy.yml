@@ -41,20 +41,13 @@ jobs:
       - name: Remove .github folder
         run: rm -rf .github
 
-      # Step 7: Copy dist folder to staging server
-      - name: Copy dist folder to staging
-        run: |
-          scp -r ./dist/ user@staging-server:/path/to/staging/folder
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # Step 8: Configure Git
+      # Step 7: Configure Git
       - name: Configure Git
         run: |
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 9: Check if production branch exists and create it from staging if it doesn't
+      # Step 8: Check if production branch exists and create it from staging if it doesn't
       - name: Check if production branch exists
         run: |
           git fetch origin production:production || git checkout -b production
@@ -62,7 +55,7 @@ jobs:
           git merge staging --no-edit || echo "No changes to merge"
           git push origin production
 
-      # Step 10: Commit and push changes
+      # Step 9: Commit and push changes
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +65,7 @@ jobs:
           git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin HEAD:staging --force
 
-      # Step 11: Create a Pull Request from staging to production
+      # Step 10: Create a Pull Request from staging to production
       - name: Create Pull Request to Production
         uses: repo-sync/pull-request@v2
         with:
