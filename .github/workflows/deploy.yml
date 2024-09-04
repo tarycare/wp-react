@@ -6,55 +6,59 @@ on:
       - main # Or whichever branch you want to trigger on
 
 jobs:
-  # Job 1: Checkout Code
-  checkout:
+  build:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Check out the repository
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0 # Ensure all branches are available
 
-  # Job 2: Build Project
-  build:
-    runs-on: ubuntu-latest
-    needs: checkout
-    steps:
+      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "18.12.0"
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # Step 4: Run the build script
       - name: Run build
         run: npm run build
 
-  # Job 3: Clean up Unnecessary Files
-  cleanup:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
+      # Step 5: Remove unnecessary files
       - name: Remove unnecessary files
         shell: bash
         run: |
           shopt -s extglob
           rm -rf !(dist|classes|plugin.php)
 
+      # Step 6: Remove the .github folder
       - name: Remove .github folder
         run: rm -rf .github
 
-  # Job 4: Commit and Push to Staging
-  push-to-staging:
-    runs-on: ubuntu-latest
-    needs: cleanup
-    steps:
+      # Step 7: Configure Git
       - name: Configure Git
         run: |
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
+      # Step 8: Check if master branch exists and create it if necessary
+      - name: Check and Create master branch if it doesn't exist
+        run: |
+          if git show-ref --quiet refs/heads/master; then
+            echo "Production branch exists."
+          else
+            echo "Production branch does not exist. Creating it."
+            git checkout -b master
+            git push origin master
+          fi
+
+      # Step 9: Commit and push changes
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,17 +68,13 @@ jobs:
           git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin HEAD:staging --force
 
-  # Job 5: Create Pull Request to Master
-  create-pull-request:
-    runs-on: ubuntu-latest
-    needs: push-to-staging
-    steps:
-      - name: Create Pull Request to Master
+      # Step 10: Create a Pull Request from staging to master
+      - name: Create Pull Request to Production
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: master
           source_branch: staging
-          pr_title: "Deploy from Staging to Master"
+          pr_title: "Deploy from Staging to Production"
           pr_body: "This is an automated PR to merge staging into master after build and deploy."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
