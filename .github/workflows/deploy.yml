@@ -30,12 +30,10 @@ jobs:
       - name: Run build
         run: npm run build
 
-      # Step 5: Remove unnecessary files
-      - name: Remove unnecessary files
-        shell: bash
+      # Step 5: Remove unnecessary files (excluding dist, classes, and plugin.php)
+      - name: Remove unnecessary files except for dist, classes, and plugin.php
         run: |
-          shopt -s extglob
-          rm -rf !(dist|classes|plugin.php)
+          find . -maxdepth 1 ! -name 'dist' ! -name 'classes' ! -name 'plugin.php' -exec rm -rf {} +
 
       # Step 6: Remove the .github folder
       - name: Remove .github folder
@@ -51,7 +49,7 @@ jobs:
       - name: Fetch all branches
         run: git fetch --all
 
-      # Step 9: Check if staging branch exists
+      # Step 9: Ensure staging branch exists
       - name: Ensure staging branch exists
         run: |
           if git show-ref --quiet refs/heads/staging; then
