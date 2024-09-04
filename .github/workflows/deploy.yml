@@ -33,7 +33,7 @@ jobs:
       # Step 5: Remove unnecessary files (excluding dist, classes, and plugin.php)
       - name: Remove unnecessary files except for dist, classes, and plugin.php
         run: |
-          find . -maxdepth 1 ! -name 'dist' ! -name 'classes' ! -name 'plugin.php' -exec rm -rf {} +
+          find . -mindepth 1 -maxdepth 1 ! -name 'dist' ! -name 'classes' ! -name 'plugin.php' -exec rm -rf {} +
 
       # Step 6: Remove the .github folder
       - name: Remove .github folder
