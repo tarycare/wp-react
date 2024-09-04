@@ -3,7 +3,7 @@ name: Build, Deploy, and Create PR
 on:
   push:
     branches:
-      - main # Or whichever branch you want to trigger on
+      - main # Trigger on push to the main branch
 
 jobs:
   build:
@@ -54,15 +54,17 @@ jobs:
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git push origin HEAD:staging --force
 
-      # Step 8: Check if master exists, and create if not
+      # Step 8: Check if master exists, and create if it doesn't (without pushing any changes)
       - name: Check and create master branch if it doesn't exist
         run: |
           if ! git ls-remote --exit-code --heads origin master; then
             git checkout -b master main
             git push origin master
+          else
+            echo "Master branch already exists"
           fi
 
-      # Step 9: Create a pull request from staging to master branch
+      # Step 9: Create a pull request from staging to master
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
