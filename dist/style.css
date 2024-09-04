@@ -1,21 +1,21 @@
 /* src/fonts.css */
 @font-face {
   font-family: "MyFont";
-  src: url(/wp-content/plugins/wp-react-kickoff/dist/my-Regular.woff2) format("woff2");
+  src: url(/dist/fonts/my-Regular.woff2) format("woff2");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "MyFont";
-  src: url(/wp-content/plugins/wp-react-kickoff/dist/my-Bold.woff2) format("woff2");
+  src: url(/dist/fonts/my-Bold.woff2) format("woff2");
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: "MyFont";
-  src: url(/wp-content/plugins/wp-react-kickoff/dist/my-SemiBold.woff2) format("woff2");
+  src: url(/dist/fonts/my-SemiBold.woff2) format("woff2");
   font-weight: 600;
   font-style: normal;
 }
