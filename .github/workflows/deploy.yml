@@ -118,6 +118,19 @@ jobs:
           git merge staging
           git push origin master --force
 
+      # Step 5: Cherry-pick the latest commit from staging automatically
+      - name: Cherry-pick the latest commit from staging
+        run: |
+          git fetch origin
+          git checkout master
+          # Get the latest commit hash from staging
+          LATEST_COMMIT=$(git log origin/staging --pretty=format:'%H' -n 1)
+          echo "Cherry-picking commit: $LATEST_COMMIT"
+          # Cherry-pick the latest commit
+          git cherry-pick $LATEST_COMMIT
+          # Push the changes to master
+          git push origin master
+
       # Step 6: Create a pull request from staging to master
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
