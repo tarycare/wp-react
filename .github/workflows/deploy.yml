@@ -34,6 +34,9 @@ jobs:
         run: |
           shopt -s extglob
           rm -rf !(dist|classes|plugin.php)
+        # Step 5.1: Remove the .github folder
+      - name: Remove .github folder
+        run: rm -rf .github
 
       # Step 6: Configure Git
       - name: Configure Git
