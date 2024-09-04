@@ -52,15 +52,18 @@ jobs:
         run: |
           git fetch origin
 
-      # Step 9: Check if production branch exists and create it from staging if necessary
-      - name: Check and create production branch from staging if necessary
+      # Step 9: Check if production branch exists, handle push or PR accordingly
+      - name: Push to production or create PR from staging
         run: |
           if git show-ref --quiet refs/remotes/origin/production; then
-            echo "Production branch exists."
+            echo "Production branch exists, creating a pull request."
+            exit 0
           else
+            echo "Production branch not found. Pushing staging to production."
             git checkout staging
             git checkout -b production
             git push origin production
+            exit 1
           fi
 
       # Step 10: Commit and push changes to staging
@@ -72,8 +75,9 @@ jobs:
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git push origin staging --force
 
-      # Step 11: Create a Pull Request from staging to production
+      # Step 11: Create a Pull Request from staging to production if production exists
       - name: Create Pull Request to Production
+        if: success()
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: production
