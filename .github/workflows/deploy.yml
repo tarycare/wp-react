@@ -30,7 +30,8 @@ jobs:
       # Step 4: Remove all files except /dist, /classes, and plugin.php
       - name: Remove unnecessary files
         run: |
-          rm -rf !(dist|classes|plugin.php)
+          find . -type f ! -name 'plugin.php' -exec rm -f {} +
+          find . -type d ! -name 'dist' ! -name 'classes' ! -path '.' -exec rm -rf {} +
 
       # Step 5: Commit the changes
       - name: Commit changes
