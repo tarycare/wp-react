@@ -53,12 +53,13 @@ jobs:
           if git show-ref --quiet refs/heads/production; then
             echo "Production branch exists."
           else
-            echo "Production branch does not exist. Creating it."
+            echo "Production branch does not exist. Creating it from staging."
+            git checkout staging
             git checkout -b production
             git push origin production
           fi
 
-      # Step 9: Commit and push changes
+      # Step 9: Commit and push changes to staging
       - name: Commit and push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,7 +67,7 @@ jobs:
           git add -A
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
-          git push origin HEAD:staging --force
+          git push origin staging --force
 
       # Step 10: Create a Pull Request from staging to production
       - name: Create Pull Request to Production
