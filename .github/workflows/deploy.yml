@@ -47,16 +47,13 @@ jobs:
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 8: Check if production branch exists and create it if necessary
-      - name: Check and Create production branch if it doesn't exist
+      # Step 8: Check if production branch exists and create it from staging if it doesn't
+      - name: Check if production branch exists
         run: |
-          if git show-ref --quiet refs/heads/production; then
-            echo "Production branch exists."
-          else
-            echo "Production branch does not exist. Creating it."
-            git checkout -b production
-            git push origin production
-          fi
+          git fetch origin production:production || git checkout -b production
+          git checkout production
+          git merge staging --no-edit || echo "No changes to merge"
+          git push origin production
 
       # Step 9: Commit and push changes
       - name: Commit and push changes
