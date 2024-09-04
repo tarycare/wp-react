@@ -81,7 +81,7 @@ const App = () => {
         {/* sheet */}
 
         <Sheet>
-          لا تنسى الاشتراك في القناة
+          لا تنسى الاشتراك في القناة , وتفعيل الجرس ليصلك كل جديد
           <SheetTrigger>Open Sheet</SheetTrigger>
           <SheetContent>
             <SheetHeader className="mt-6">
