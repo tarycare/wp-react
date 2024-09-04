@@ -23,16 +23,11 @@ module.exports = {
       },
       {
         test: /\.(woff(2)?|eot|ttf|otf|svg)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              outputPath: "fonts",
-              publicPath: "/dist/fonts",
-              name: "[name].[ext]",
-            },
-          },
-        ],
+        type: "asset/resource",
+        generator: {
+          filename: "fonts/[name][ext]", // Ensures the original names are preserved
+          publicPath: "/dist/fonts",
+        },
       },
     ],
   },

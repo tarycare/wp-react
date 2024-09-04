@@ -1,21 +1,21 @@
 /* src/fonts.css */
 @font-face {
   font-family: "MyFont";
-  src: url(/dist/ac2289c14e05df25fbdd.woff2) format("woff2");
+  src: url(/dist/fontsfonts/my-Regular.woff2) format("woff2");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "MyFont";
-  src: url(/dist/c76c5059eeda58e21639.woff2) format("woff2");
+  src: url(/dist/fontsfonts/my-Bold.woff2) format("woff2");
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: "MyFont";
-  src: url(/dist/7216e851161bf78c543c.woff2) format("woff2");
+  src: url(/dist/fontsfonts/my-SemiBold.woff2) format("woff2");
   font-weight: 600;
   font-style: normal;
 }
