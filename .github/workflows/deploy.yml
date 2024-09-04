@@ -1,13 +1,12 @@
-name: Sync main to staging and create PR to master
+name: Build and Deploy
 
 on:
   push:
     branches:
-      - main # Trigger on push to the main branch
+      - main # Or whichever branch you want to trigger on
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +18,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18.17.0"
+          node-version: "18.12.0"
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -29,106 +28,31 @@ jobs:
       - name: Run build
         run: npm run build
 
-      # Step 5: Remove unnecessary files (keep only dist, classes, plugin.php)
+      # Step 5: Remove unnecessary files
       - name: Remove unnecessary files
         shell: bash
         run: |
           shopt -s extglob
           rm -rf !(dist|classes|plugin.php)
 
-      # Step 5.1: Remove the .github folder and .gitignore
-      - name: Remove .github folder and .gitignore
-        run: |
-          rm -rf .github
-          rm -rf .gitignore
+      # Step 6: Remove the .github folder
+      - name: Remove .github folder
+        run: rm -rf .github
 
-  push_staging:
-    name: Push to Staging
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      # Step 1: Check out the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Step 2: Configure Git (Set identity for the runner)
+      # Step 7: Configure Git
       - name: Configure Git
         run: |
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 3: Push main branch to staging
-      - name: Push main to staging
+      # Step 8: Commit and push changes
+      - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git fetch origin
-          git checkout main
-          git pull origin main
-          git push origin main:staging --force
-
-  pr_master:
-    name: PR to Master
-    runs-on: ubuntu-latest
-    needs: push_staging
-
-    steps:
-      # Step 1: Check out the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Step 2: Configure Git (Set identity for the runner)
-      - name: Configure Git
-        run: |
-          git config --global user.email "abusiraj84@gmail.com"
-          git config --global user.name "abusiraj84"
-
-      # Step 3: Ensure master branch exists
-      - name: Ensure master branch exists
-        run: |
-          if ! git ls-remote --exit-code --heads origin master; then
-            git checkout --orphan master
-            git rm -rf .
-            echo "# Master branch" > README.md
-            git add README.md
-            git commit -m "Initial commit for master branch"
-            git push origin master
-          else
-            echo "Master branch already exists"
-          fi
-
-      # Step 4: Rebase staging onto master
-      - name: Rebase staging onto master
-        run: |
-          git fetch origin
-          git checkout master
-          git pull origin master
-          git checkout staging
-          git rebase --onto master staging
-          git checkout master
-          git merge staging
-          git push origin master --force
-
-      # Step 5: Cherry-pick the latest commit from staging and resolve conflicts automatically
-      - name: Cherry-pick the latest commit from staging
-        run: |
-          git fetch origin
-          git checkout master
-          # Get the latest commit hash from staging
-          LATEST_COMMIT=$(git log origin/staging --pretty=format:'%H' -n 1)
-          echo "Cherry-picking commit: $LATEST_COMMIT"
-          # Cherry-pick the latest commit and handle conflicts automatically by favoring master branch changes
-          git cherry-pick $LATEST_COMMIT || (
-            git checkout --theirs . && git add . && git cherry-pick --continue
-          )
-          # Push the changes to master
-          git push origin master
-
-      # Step 6: Create a pull request from staging to master
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: master # Target branch (master)
-          branch: staging # Source branch (staging)
-          title: "Pull request from staging to master"
-          body: "This is an automated pull request created after syncing main to staging."
+          git add -A
+          git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
+          git remote set-url origin https://abusiraj84:${{ secrets.GH_TOKEN }}@github.com/abusiraj84/wp-react.git
+          git push origin HEAD:staging --force
+          # open a pull request to production branch
+          gh pr create --base main --head staging --title "Deploy to production" --body "Deploy to production"
