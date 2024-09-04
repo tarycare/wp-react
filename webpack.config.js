@@ -25,8 +25,9 @@ module.exports = {
         test: /\.(woff(2)?|eot|ttf|otf|svg)$/,
         type: "asset/resource",
         generator: {
-          filename: "fonts/[name][ext]",
-          publicPath: "/dist/fonts",
+          filename: "[name][ext]", // Output without hashes
+          publicPath: "/wp-content/plugins/wp-react-kickoff/dist/", // Correct path for production
+          outputPath: "fonts", // Ensures fonts are placed in dist/fonts
         },
       },
     ],
