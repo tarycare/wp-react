@@ -14,51 +14,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js
+      # Step 2: Set up Node.js (if needed for your build)
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "18.17.0"
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # Step 4: Run the build script
-      - name: Run build
-        run: npm run build
-
-      # Step 5: Remove unnecessary files
-      - name: Remove unnecessary files
-        shell: bash
+      # Step 3: Push changes from main to staging
+      - name: Push main to staging
         run: |
-          shopt -s extglob
-          rm -rf !(dist|classes|plugin.php)
+          git fetch origin
+          git checkout main
+          git pull origin main
+          git push origin main:staging --force
 
-      # Step 5.1: Remove the .github folder and .gitignore
-      - name: Remove .github folder and .gitignore
-        run: |
-          rm -rf .github
-          rm -rf .gitignore
-
-      # Step 6: Configure Git
-      - name: Configure Git
-        run: |
-          git config --global user.email "abusiraj84@gmail.com"
-          git config --global user.name "abusiraj84"
-
-      # Step 7: Commit and push the changes to staging
-      - name: Commit and push changes to staging
-        run: |
-          git add -A  # Stage all changes, including file deletions
-          git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
-          git push origin HEAD:staging --force
-
-      # Step 8: Ensure the master branch exists but don't push any changes from staging
-      - name: Ensure master branch exists
+      # Step 4: Check if the master branch exists, create it if it doesn't
+      - name: Ensure master branch exists without pushing changes
         run: |
           if ! git ls-remote --exit-code --heads origin master; then
-            # Create an empty master branch without pushing any changes from main or staging
+            # Create an orphan branch master with no changes from staging
             git checkout --orphan master
             git rm -rf .
             echo "# Master branch" > README.md
@@ -69,7 +43,7 @@ jobs:
             echo "Master branch already exists"
           fi
 
-      # Step 9: Create a pull request from staging to master
+      # Step 5: Create a pull request from staging to master
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
@@ -77,4 +51,4 @@ jobs:
           base: master # Target branch (master)
           branch: staging # Source branch (staging)
           title: "Pull request from staging to master"
-          body: "This is an automated pull request created after a successful build and deployment to staging."
+          body: "This is an automated pull request created after pushing main to staging."
