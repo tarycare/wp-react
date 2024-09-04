@@ -37,6 +37,7 @@ jobs:
         # Step 5.1: Remove the .github folder
       - name: Remove .github folder
         run: rm -rf .github
+          rm -rf .gitignore
 
       # Step 6: Configure Git
       - name: Configure Git
