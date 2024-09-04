@@ -47,15 +47,15 @@ jobs:
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 8: Check if master branch exists and create it if necessary
-      - name: Check and Create master branch if it doesn't exist
+      # Step 8: Check if production branch exists and create it if necessary
+      - name: Check and Create production branch if it doesn't exist
         run: |
-          if git show-ref --quiet refs/heads/master; then
+          if git show-ref --quiet refs/heads/production; then
             echo "Production branch exists."
           else
             echo "Production branch does not exist. Creating it."
-            git checkout -b master
-            git push origin master
+            git checkout -b production
+            git push origin production
           fi
 
       # Step 9: Commit and push changes
@@ -68,13 +68,13 @@ jobs:
           git remote set-url origin https://abusiraj84:${{ secrets.GITHUB_TOKEN }}@github.com/abusiraj84/wp-react.git
           git push origin HEAD:staging --force
 
-      # Step 10: Create a Pull Request from staging to master
+      # Step 10: Create a Pull Request from staging to production
       - name: Create Pull Request to Production
         uses: repo-sync/pull-request@v2
         with:
-          destination_branch: master
+          destination_branch: production
           source_branch: staging
           pr_title: "Deploy from Staging to Production"
-          pr_body: "This is an automated PR to merge staging into master after build and deploy."
+          pr_body: "This is an automated PR to merge staging into production after build and deploy."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
