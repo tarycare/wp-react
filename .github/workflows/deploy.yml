@@ -28,11 +28,17 @@ jobs:
           git pull origin main
           git push origin main:staging --force
 
-      # Step 4: Check if the master branch exists, create it if it doesn't
+      # Step 4: Configure Git for committing in this repository
+      - name: Configure Git
+        run: |
+          git config --global user.email "abusiraj84@gmail.com"
+          git config --global user.name "abusiraj84"
+
+      # Step 5: Check if the master branch exists, create it if it doesn't
       - name: Ensure master branch exists without pushing changes
         run: |
           if ! git ls-remote --exit-code --heads origin master; then
-            # Create an orphan branch master with no changes from staging
+            # Create an orphan branch master with no changes from main or staging
             git checkout --orphan master
             git rm -rf .
             echo "# Master branch" > README.md
@@ -43,7 +49,7 @@ jobs:
             echo "Master branch already exists"
           fi
 
-      # Step 5: Create a pull request from staging to master
+      # Step 6: Create a pull request from staging to master
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
