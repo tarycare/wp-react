@@ -81,8 +81,7 @@ const App = () => {
         {/* sheet */}
 
         <Sheet>
-          الستيج شغال كويس
-          <SheetTrigger>Open Sheet</SheetTrigger>
+          امرنا تمام <SheetTrigger>Open Sheet</SheetTrigger>
           <SheetContent>
             <SheetHeader className="mt-6">
               <SheetTitle>Are you absolutely sure?</SheetTitle>
