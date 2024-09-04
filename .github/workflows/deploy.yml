@@ -47,11 +47,15 @@ jobs:
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 8: Checkout the staging branch
-      - name: Checkout staging branch
+      # Step 8: Check if staging branch exists, create if not
+      - name: Check and create staging branch if necessary
         run: |
-          git checkout staging || git checkout -b staging
-          git pull origin staging
+          if git show-ref --quiet refs/remotes/origin/staging; then
+            git checkout staging
+          else
+            git checkout -b staging
+            git push origin staging
+          fi
 
       # Step 9: Commit and push changes to staging
       - name: Commit and push changes to staging
