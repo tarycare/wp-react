@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build, Deploy, and Create PR
 
 on:
   push:
@@ -34,9 +34,11 @@ jobs:
         run: |
           shopt -s extglob
           rm -rf !(dist|classes|plugin.php)
-        # Step 5.1: Remove the .github folder
+
+      # Step 5.1: Remove the .github folder and .gitignore
       - name: Remove .github folder
-        run: rm -rf .github
+        run: |
+          rm -rf .github
           rm -rf .gitignore
 
       # Step 6: Configure Git
@@ -45,10 +47,19 @@ jobs:
           git config --global user.email "abusiraj84@gmail.com"
           git config --global user.name "abusiraj84"
 
-      # Step 7: Commit and push the changes
+      # Step 7: Commit and push the changes to staging
       - name: Commit and push changes
         run: |
           git add -A  # Stage all changes, including file deletions
           git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git push origin HEAD:staging --force
-          git push origin HEAD:production --force
+
+      # Step 8: Create a pull request from staging to master
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: master # Base branch where you want the PR to be opened (e.g., master)
+          head: staging # Source branch (staging)
+          title: "Pull request from staging to master"
+          body: "This is an automated pull request created after a successful build and deployment to staging."
