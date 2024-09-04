@@ -44,6 +44,6 @@ jobs:
       # Step 7: Commit and push the changes
       - name: Commit and push changes
         run: |
-          git add dist/ classes/ plugin.php
-          git commit -m "Deploy plugin with only dist, classes, and plugin.php"
+          git add -A  # Stage all changes, including file deletions
+          git commit -m "Deploy plugin with only dist, classes, and plugin.php" || echo "No changes to commit"
           git push origin HEAD:deployment-branch --force
