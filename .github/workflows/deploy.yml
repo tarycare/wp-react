@@ -29,33 +29,23 @@ jobs:
       - name: Run build
         run: npm run build
 
-  push_main:
-    name: Push to Main
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      # Step 1: Check out the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Step 2: Configure Git (Set identity for the runner)
-      - name: Configure Git
+      # Step 5: Remove unnecessary files (keep only dist, classes, plugin.php)
+      - name: Remove unnecessary files
+        shell: bash
         run: |
-          git config --global user.email "abusiraj84@gmail.com"
-          git config --global user.name "abusiraj84"
+          shopt -s extglob
+          rm -rf !(dist|classes|plugin.php)
 
-      # Step 3: Push changes to main
-      - name: Push to main branch
+      # Step 5.1: Remove the .github folder and .gitignore
+      - name: Remove .github folder and .gitignore
         run: |
-          git checkout main
-          git pull origin main
-          git push origin main --force
+          rm -rf .github
+          rm -rf .gitignore
 
   push_staging:
     name: Push to Staging
     runs-on: ubuntu-latest
-    needs: push_main
+    needs: build
 
     steps:
       # Step 1: Check out the repository
