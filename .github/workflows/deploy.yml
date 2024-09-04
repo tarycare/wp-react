@@ -1,0 +1,46 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main # Run the action only when code is pushed to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js and install dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16" # Specify the Node.js version, adjust if needed
+
+      - name: Install dependencies
+        run: npm install
+
+      # Step 3: Run the build script
+      - name: Run build
+        run: npm run build
+
+      # Step 4: Remove all files except /dist, /classes, and plugin.php
+      - name: Remove unnecessary files
+        run: |
+          rm -rf !(dist|classes|plugin.php)
+
+      # Step 5: Commit the changes
+      - name: Commit changes
+        run: |
+          git config --global user.email "abusiraj84@gmail.com"
+          git config --global user.name "abusiraj84"
+          git add dist/ classes/ plugin.php
+          git commit -m "Deploy plugin with only dist, classes, and plugin.php"
+
+      # Step 6: Push to the deployment branch
+      - name: Push to deployment branch
+        run: |
+          git push origin HEAD:deployment-branch --force
