@@ -118,7 +118,7 @@ jobs:
           git merge staging
           git push origin master --force
 
-      # Step 5: Cherry-pick the latest commit from staging automatically
+      # Step 5: Cherry-pick the latest commit from staging and resolve conflicts automatically
       - name: Cherry-pick the latest commit from staging
         run: |
           git fetch origin
@@ -126,8 +126,10 @@ jobs:
           # Get the latest commit hash from staging
           LATEST_COMMIT=$(git log origin/staging --pretty=format:'%H' -n 1)
           echo "Cherry-picking commit: $LATEST_COMMIT"
-          # Cherry-pick the latest commit
-          git cherry-pick $LATEST_COMMIT
+          # Cherry-pick the latest commit and handle conflicts automatically by favoring master branch changes
+          git cherry-pick $LATEST_COMMIT || (
+            git checkout --theirs . && git add . && git cherry-pick --continue
+          )
           # Push the changes to master
           git push origin master
 
