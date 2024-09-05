@@ -49,17 +49,21 @@ export default function Component() {
           <TableHeader>
             <TableRow>
               <TableHead className="hidden w-[100px] sm:table-cell">
-                <span className="sr-only">img</span>
+                <span>{t("Image")}</span>
               </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Price</TableHead>
+              <TableHead>{t("Product Name")}</TableHead>
+              <TableHead>{t("Status")}</TableHead>
               <TableHead className="hidden md:table-cell">
-                Total Sales
+                {t("Price")}
               </TableHead>
-              <TableHead className="hidden md:table-cell">Created at</TableHead>
+              <TableHead className="hidden md:table-cell">
+                {t("Inventory")}
+              </TableHead>
+              <TableHead className="hidden md:table-cell">
+                {t("Last Updated")}
+              </TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">{t("Actions")}</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -75,7 +79,7 @@ export default function Component() {
                 Laser Lemonade Machine
               </TableCell>
               <TableCell>
-                <Badge variant="outline">Draft</Badge>
+                <Badge variant="outline">{t("Draft")}</Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">$499.99</TableCell>
               <TableCell className="hidden md:table-cell">25</TableCell>
@@ -109,7 +113,7 @@ export default function Component() {
                 Hypernova Headphones
               </TableCell>
               <TableCell>
-                <Badge variant="outline">Active</Badge>
+                <Badge variant="outline">{t("Active")}</Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">$129.99</TableCell>
               <TableCell className="hidden md:table-cell">100</TableCell>
@@ -141,7 +145,7 @@ export default function Component() {
               </TableCell>
               <TableCell className="font-medium">AeroGlow Desk Lamp</TableCell>
               <TableCell>
-                <Badge variant="outline">Active</Badge>
+                <Badge variant="outline">{t("Active")}</Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">$39.99</TableCell>
               <TableCell className="hidden md:table-cell">50</TableCell>
@@ -175,7 +179,7 @@ export default function Component() {
                 TechTonic Energy Drink
               </TableCell>
               <TableCell>
-                <Badge variant="secondary">Draft</Badge>
+                <Badge variant="secondary">{t("Draft")}</Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">$2.99</TableCell>
               <TableCell className="hidden md:table-cell">0</TableCell>
@@ -209,7 +213,7 @@ export default function Component() {
                 Gamer Gear Pro Controller
               </TableCell>
               <TableCell>
-                <Badge variant="outline">Active</Badge>
+                <Badge variant="outline">{t("Active")}</Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">$59.99</TableCell>
               <TableCell className="hidden md:table-cell">75</TableCell>
@@ -241,7 +245,7 @@ export default function Component() {
               </TableCell>
               <TableCell className="font-medium">Luminous VR Headset</TableCell>
               <TableCell>
-                <Badge variant="outline">Active</Badge>
+                <Badge variant="outline">{t("Active")}</Badge>
               </TableCell>
               <TableCell className="hidden md:table-cell">$199.99</TableCell>
               <TableCell className="hidden md:table-cell">30</TableCell>
