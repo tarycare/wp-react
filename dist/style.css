@@ -634,6 +634,19 @@ body{
   --tw-contain-paint:  ;
   --tw-contain-style:  ;
 }
+.container{
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+@media (min-width: 1400px){
+
+  .container{
+    max-width: 1400px;
+  }
+}
 .sr-only{
   position: absolute;
   width: 1px;
@@ -786,6 +799,9 @@ body{
 .mb-3{
   margin-bottom: 0.75rem;
 }
+.mb-4{
+  margin-bottom: 1rem;
+}
 .ml-1{
   margin-left: 0.25rem;
 }
@@ -845,6 +861,9 @@ body{
 }
 .h-12{
   height: 3rem;
+}
+.h-16{
+  height: 4rem;
 }
 .h-2{
   height: 0.5rem;
@@ -918,6 +937,9 @@ body{
 .w-11{
   width: 2.75rem;
 }
+.w-16{
+  width: 4rem;
+}
 .w-2{
   width: 0.5rem;
 }
@@ -981,6 +1003,9 @@ body{
 }
 .min-w-\[var\(--radix-select-trigger-width\)\]{
   min-width: var(--radix-select-trigger-width);
+}
+.min-w-full{
+  min-width: 100%;
 }
 .max-w-lg{
   max-width: 32rem;
@@ -1105,13 +1130,15 @@ body{
 .gap-4{
   gap: 1rem;
 }
-.gap-8{
-  gap: 2rem;
-}
 .space-x-1 > :not([hidden]) ~ :not([hidden]){
   --tw-space-x-reverse: 0;
   margin-right: calc(0.25rem * var(--tw-space-x-reverse));
   margin-left: calc(0.25rem * calc(1 - var(--tw-space-x-reverse)));
+}
+.space-x-2 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
 }
 .space-x-4 > :not([hidden]) ~ :not([hidden]){
   --tw-space-x-reverse: 0;
@@ -1155,6 +1182,9 @@ body{
 }
 .break-words{
   overflow-wrap: break-word;
+}
+.rounded{
+  border-radius: 0.25rem;
 }
 .rounded-\[2px\]{
   border-radius: 2px;
@@ -1221,6 +1251,14 @@ body{
 .border-destructive\/50{
   border-color: hsl(var(--destructive) / 0.5);
 }
+.border-gray-200{
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+.border-gray-400{
+  --tw-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity));
+}
 .border-input{
   border-color: hsl(var(--input));
 }
@@ -1282,8 +1320,16 @@ body{
 .bg-transparent{
   background-color: transparent;
 }
+.bg-white{
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
 .fill-current{
   fill: currentColor;
+}
+.object-cover{
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 .p-0{
   padding: 0px;
@@ -1394,6 +1440,9 @@ body{
 .pt-4{
   padding-top: 1rem;
 }
+.text-left{
+  text-align: left;
+}
 .text-center{
   text-align: center;
 }
@@ -1458,6 +1507,10 @@ body{
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
 }
+.text-blue-500{
+  --tw-text-opacity: 1;
+  color: rgb(59 130 246 / var(--tw-text-opacity));
+}
 .text-card-foreground{
   color: hsl(var(--card-foreground));
 }
@@ -1476,6 +1529,14 @@ body{
 .text-foreground\/50{
   color: hsl(var(--foreground) / 0.5);
 }
+.text-gray-500{
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity));
+}
+.text-gray-700{
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
 .text-muted-foreground{
   color: hsl(var(--muted-foreground));
 }
@@ -1487,6 +1548,10 @@ body{
 }
 .text-primary-foreground{
   color: hsl(var(--primary-foreground));
+}
+.text-red-500{
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 .text-secondary-foreground{
   color: hsl(var(--secondary-foreground));
@@ -1512,6 +1577,11 @@ body{
 }
 .opacity-90{
   opacity: 0.9;
+}
+.shadow{
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 .shadow-lg{
   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -1739,6 +1809,10 @@ body{
 }
 .hover\:text-primary-foreground:hover{
   color: hsl(var(--primary-foreground));
+}
+.hover\:text-red-700:hover{
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity));
 }
 .hover\:text-white:hover{
   --tw-text-opacity: 1;
@@ -2256,10 +2330,6 @@ body{
 
   .sm\:mt-0{
     margin-top: 0px;
-  }
-
-  .sm\:flex{
-    display: flex;
   }
 
   .sm\:table-cell{
