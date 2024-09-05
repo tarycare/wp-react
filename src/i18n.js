@@ -7,12 +7,14 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   en: {
     translation: {
-      welcomeMsg: "Welcome to React and react-i18next",
+      "product desc": "This is a product description",
+      Products: "Products",
     },
   },
   ar: {
     translation: {
-      welcomeMsg: "مرحبًا بك في React و react-i18next",
+      "product desc": "هذا وصف المنتج",
+      Products: "منتجات",
     },
   },
 };

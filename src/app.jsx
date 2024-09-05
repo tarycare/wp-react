@@ -31,7 +31,7 @@ import { useTranslation } from "react-i18next";
 export default function Component() {
   const { t, i18n } = useTranslation();
   console.log("NODE_ENV:", process.env.NODE_ENV); // Should log "development"
-  // check html dir attribute it if rtl  set i18n.language to ar else en
+  // check html dir attribute it if rtl  set i18n.language to ar else en..
   if (document.documentElement.dir === "rtl") {
     i18n.changeLanguage("ar");
   } else {
@@ -41,8 +41,8 @@ export default function Component() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Products</CardTitle>
-        <CardDescription>{t("welcomeMsg")}</CardDescription>
+        <CardTitle>{t("Products")}</CardTitle>
+        <CardDescription>{t("product desc")}</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
