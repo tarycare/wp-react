@@ -42,6 +42,8 @@ const resources = {
       Actions: "Actions",
       Draft: "Draft",
       Active: "Active",
+      Home: "Home",
+      About: "About",
     },
   },
   ar: {
@@ -57,6 +59,8 @@ const resources = {
       Actions: "الإجراءات",
       Draft: "مسودة",
       Active: "نشط",
+      Home: "الرئيسية",
+      About: "من نحن",
     },
   },
 };
