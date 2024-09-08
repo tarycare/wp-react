@@ -13,6 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
 
 const isDev = process.env.NODE_ENV === "development";
 const baseUrl = isDev ? "http://mytest.local" : "";
@@ -25,6 +26,7 @@ const FormSchema = z.object({
 });
 
 function AddOrUpdateStaff({ onSuccess }: any) {
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -43,8 +45,7 @@ function AddOrUpdateStaff({ onSuccess }: any) {
       // Fetch the user data to prefill the form
       const fetchUserData = async () => {
         try {
-          const response = await fetch(`
-            ${baseUrl}/wp-json/doc/v1/users/${id}`);
+          const response = await fetch(`${baseUrl}/wp-json/doc/v1/users/${id}`);
           if (!response.ok) {
             throw new Error("Failed to fetch user data");
           }
@@ -74,14 +75,42 @@ function AddOrUpdateStaff({ onSuccess }: any) {
         body: JSON.stringify(values),
       });
 
+      const responseData = await response.json();
+
       if (response.ok) {
-        onSuccess();
+        // onSuccess();
+        toast({
+          title: "Success",
+          description: isUpdating
+            ? "Staff updated successfully"
+            : "Staff added successfully",
+          variant: "default",
+        });
         navigate("/"); // Redirect to the user list page
       } else {
-        console.error("Failed to process user");
+        // Handle API error message
+        const errorMessage = responseData.message || "Failed to process user";
+        console.error("Failed to process user:", errorMessage);
+
+        // Set form error for a specific field (optional)
+        form.setError("username", {
+          type: "manual",
+          message: errorMessage, // Set the API message as form error
+        });
+
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error submitting form", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit form",
+        variant: "destructive",
+      });
     }
   };
 
@@ -120,19 +149,7 @@ function AddOrUpdateStaff({ onSuccess }: any) {
                 </FormItem>
               )}
             />
-            <FormField
-              name="role"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter role" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <Button type="submit" variant="default" className="w-full mt-6">
               {isUpdating ? "Update Staff" : "Add Staff"}
             </Button>

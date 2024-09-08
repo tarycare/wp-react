@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { Button } from "./components/ui/button";
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
-import AddOrUpdateStaff from "./pages/AddOrUpdateStaff";
-import StaffDetails from "./pages/StaffDetails";
+import AddOrUpdateStaff from "@/pages/AddOrUpdateStaff";
+import StaffDetails from "@/pages/StaffDetails";
+import { useToast } from "@/components/ui/use-toast"; // Import the toast hook
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -20,6 +21,7 @@ export default function App() {
 }
 
 function Content() {
+  const { toast } = useToast(); // Initialize the toast hook
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,7 +50,11 @@ function Content() {
   const handleDelete = async (userId, role) => {
     // Prevent deletion if the user is an admin
     if (role === "admin") {
-      alert("You cannot delete an admin.");
+      toast({
+        title: "Action Denied",
+        description: "You cannot delete an admin user.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -58,11 +64,25 @@ function Content() {
       });
       if (response.ok) {
         setRefresh(!refresh); // Refresh after delete
+        toast({
+          title: "Success",
+          description: "User has been deleted successfully.",
+          variant: "default",
+        });
       } else {
-        console.error("Error deleting user");
+        toast({
+          title: "Error",
+          description: "Failed to delete user.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while deleting the user.",
+        variant: "destructive",
+      });
     }
   };
 

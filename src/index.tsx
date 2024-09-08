@@ -14,7 +14,7 @@ import StaffDetails from "./pages/StaffDetails";
 import NotFound from "./components/NotFound";
 import App from "./app";
 import "./index.css";
-// Define routes
+// Define routes for the app
 const routes: RouteObject[] = [
   {
     path: "/",
