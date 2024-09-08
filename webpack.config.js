@@ -2,17 +2,17 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { DefinePlugin } = require("webpack");
 const dotenv = require("dotenv");
-const mode = process.env.NODE_ENV || "production"; // Default to production if not set
 
-// Load environment variables based on the mode
+const mode = process.env.NODE_ENV || "production";
+
 const envFile = `.env.${mode}`;
-dotenv.config({ path: envFile }); // Load the correct .env file for production
+dotenv.config({ path: envFile });
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === "development";
 
   return {
-    entry: "./src/index.js",
+    entry: "./src/index.tsx", // Update to .tsx entry
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: "bundle.js",
@@ -21,10 +21,10 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
+          test: /\.(ts|tsx)$/, // Add TypeScript loader
           exclude: /node_modules/,
           use: {
-            loader: "babel-loader",
+            loader: "ts-loader",
           },
         },
         {
@@ -45,7 +45,7 @@ module.exports = (env, argv) => {
       ],
     },
     resolve: {
-      extensions: [".js", ".jsx"],
+      extensions: [".ts", ".tsx", ".js", ".jsx"], // Add TypeScript extensions
       alias: {
         "@": path.resolve(__dirname, "src"),
       },
@@ -55,9 +55,8 @@ module.exports = (env, argv) => {
         filename: "style.css",
       }),
       new DefinePlugin({
-        // Inject the environment variables into your JS bundle for client-side access
         "process.env.NODE_ENV": JSON.stringify(argv.mode),
-        "process.env.API_URL": JSON.stringify(process.env.API_URL), // Inject API_URL from .env.production
+        "process.env.API_URL": JSON.stringify(process.env.API_URL),
       }),
     ],
     devServer: {
@@ -76,7 +75,7 @@ module.exports = (env, argv) => {
           "X-Requested-With, content-type, Authorization",
       },
     },
-    mode: argv.mode, // Use the mode set via command line (production or development)
+    mode: argv.mode,
     stats: {
       errorDetails: true,
     },
