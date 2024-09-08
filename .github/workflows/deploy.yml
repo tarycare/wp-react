@@ -47,7 +47,7 @@ jobs:
           git fetch origin production:production || git checkout -b production staging
           git push origin production
 
-      # Step 7: Commit and push changes to staging
+      # Step 7: Commit and push changes to staging / Create a PR to production
       - name: Commit and push changes to staging
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
