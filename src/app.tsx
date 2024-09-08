@@ -5,7 +5,7 @@ import { FiEdit, FiTrash } from "react-icons/fi";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import AddOrUpdateStaff from "@/pages/AddOrUpdateStaff";
 import StaffDetails from "@/pages/StaffDetails";
-import { useToast } from "@/components/ui/use-toast"; // Import the toast hook
+import { useToast } from "@/components/ui/use-toast";
 
 const isDev = process.env.NODE_ENV === "development";
 
