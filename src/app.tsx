@@ -48,7 +48,7 @@ function Content() {
   }, [refresh]);
 
   const handleDelete = async (userId, role) => {
-    // Prevent deletion if the user is an admin
+    // Prevent deletion if the user is an admin ///
     if (role === "admin") {
       toast({
         title: "Action Denied",
