@@ -14,13 +14,15 @@ import StaffDetails from "./pages/StaffDetails";
 import NotFound from "./components/NotFound";
 import App from "./app";
 import "./index.css";
+import DynamicForm from "./FormBuilder";
 // Define routes for the app
 const routes: RouteObject[] = [
   {
     path: "/",
     element: (
       <div>
-        <App />
+        {/* <App /> */}
+        <DynamicForm />
       </div>
     ),
   },

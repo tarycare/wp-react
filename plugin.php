@@ -28,7 +28,7 @@ define('WPRK_URL', trailingslashit(plugins_url('/', __FILE__)));
 add_action('admin_enqueue_scripts', 'load_scripts');
 function load_scripts()
 {
-    $is_dev = defined('WP_DEBUG') && WP_DEBUG;
+    $is_dev = defined('WP_ENV') && WP_ENV === 'development';
 
     if ($is_dev) {
         // Load from Webpack Dev Server

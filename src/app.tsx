@@ -96,7 +96,9 @@ function Content() {
 
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-foreground text-2xl mb-4">Staff Management System</h2>
+      <h2 className="text-foreground text-2xl mb-4">
+        Staff Management System kkkkk
+      </h2>
       <p className="mb-6">
         Manage your staff with ease. Add, edit, delete, and view staff members.
       </p>
