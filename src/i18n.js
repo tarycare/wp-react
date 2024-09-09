@@ -1,66 +1,30 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-// <TableRow>
-// <TableHead className="hidden w-[100px] sm:table-cell">
-//   <span className="sr-only">
-//       {t("Product Image")}
-//   </span>
-// </TableHead>
-// <TableHead>
-//   {t("Product Name")}
-// </TableHead>
-// <TableHead>
-//   {t("Status")}
-// </TableHead>
-// <TableHead className="hidden md:table-cell">
-//   {t("Price")}
-// </TableHead>
-// <TableHead className="hidden md:table-cell">
-//   {t("Inventory")}
-// </TableHead>
-// <TableHead className="hidden md:table-cell">
-//   {t("Last Updated")}
-// </TableHead>
-// <TableHead>
-//   <span className="sr-only">
-//       {t("Actions")}
-//   </span>
-// </TableHead>
-// </TableRow>
+// Personal Information
+
+// Name
+// Nationality
+// Personal ID Number
+// Phone Number
+// Email
 const resources = {
   en: {
     translation: {
-      "product desc": "This is a product description",
-      Products: "Products",
-      Image: "Image",
-      "Product Name": "Product Name",
-      Status: "Status",
-      Price: "Price",
-      Inventory: "Inventory",
-      "Last Updated": "Last Updated",
-      Actions: "Actions",
-      Draft: "Draft",
-      Active: "Active",
-      Home: "Home",
-      About: "About",
+      "Personal Information": "Personal Information",
+      Name: "Name",
+      "National ID": "National ID",
+      "Phone Number": "Phone Number",
+      Email: "Email",
     },
   },
   ar: {
     translation: {
-      "product desc": "هذا وصف المنتج",
-      Products: "منتجات",
-      Image: "الصورة",
-      "Product Name": "اسم المنتج",
-      Status: "الحالة",
-      Price: "السعر",
-      Inventory: "المخزون",
-      "Last Updated": "آخر تحديث",
-      Actions: "الإجراءات",
-      Draft: "مسودة",
-      Active: "نشط",
-      Home: "الرئيسية",
-      About: "من نحن",
+      "Personal Information": "معلومات شخصية",
+      Name: "الاسم",
+      "National ID": "الرقم القومي",
+      "Phone Number": "رقم الهاتف",
+      Email: "البريد الالكتروني",
     },
   },
 };

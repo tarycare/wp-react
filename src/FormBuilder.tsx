@@ -5,21 +5,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { MultiSelect } from "@/components/ui/multi-select"; // Corrected MultiSelect import
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DateTimePickerV2 } from "@/components/date-time-picker-v2";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils"; // utility for class names
-import { Checkbox } from "@/components/ui/checkbox"; // Correct Checkbox import
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"; // Import Accordion components
 import {
   Command,
   CommandEmpty,
@@ -28,161 +31,50 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"; // For Combobox
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"; // Icons for Combobox
-
-// Sample frameworks list for MultiSelect with icons
-import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
-
-// Framework list example for the MultiSelect
-const frameworksList = [
-  { value: "react", label: "React", icon: Turtle },
-  { value: "angular", label: "Angular", icon: Cat },
-  { value: "vue", label: "Vue", icon: Dog },
-  { value: "svelte", label: "Svelte", icon: Rabbit },
-  { value: "ember", label: "Ember", icon: Fish },
-];
-
-// Combobox data
-const comboboxFrameworks = [
-  { value: "next.js", label: "Next.js" },
-  { value: "sveltekit", label: "SvelteKit" },
-  { value: "nuxt.js", label: "Nuxt.js" },
-  { value: "remix", label: "Remix" },
-  { value: "astro", label: "Astro" },
-];
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
+import { Separator } from "./components/ui/separator";
 
 // Dynamically create Zod schema based on the JSON structure
-const createSchema = (fields: any) => {
+const createSchema = (sections: any) => {
   const schemaObject: any = {};
-  fields.forEach((field: any) => {
-    let validation = z.string();
-    if (field.validation?.required) {
-      validation = validation.nonempty(field.validation.required);
-    }
-    if (field.validation?.minLength) {
-      validation = validation.min(
-        field.validation.minLength.value,
-        field.validation.minLength.message
-      );
-    }
-    if (field.validation?.maxLength) {
-      validation = validation.max(
-        field.validation.maxLength.value,
-        field.validation.maxLength.message
-      );
-    }
-    schemaObject[field.name] = validation;
+  sections.forEach((section: any) => {
+    section.fields.forEach((field: any) => {
+      let validation = z.string();
+      if (field.validation?.required) {
+        validation = validation.nonempty(field.validation.required);
+      }
+      if (field.validation?.minLength) {
+        validation = validation.min(
+          field.validation.minLength.value,
+          field.validation.minLength.message
+        );
+      }
+      if (field.validation?.maxLength) {
+        validation = validation.max(
+          field.validation.maxLength.value,
+          field.validation.maxLength.message
+        );
+      }
+      schemaObject[field.name] = validation;
+    });
   });
   return z.object(schemaObject);
 };
 
-// JSON data
-const formJson = {
-  fields: [
-    {
-      name: "acceptTerms",
-      type: "checkbox",
-      component: "Checkbox",
-      label: "Accept Terms",
-      validation: {
-        required: "You must accept the terms",
-      },
-    },
-    {
-      name: "gender",
-      type: "radio",
-      component: "RadioGroup",
-      label: "Gender",
-      items: [
-        { value: "male", label: "Male" },
-        { value: "female", label: "Female" },
-      ],
-      validation: {
-        required: "Please select a gender",
-      },
-    },
-    {
-      name: "skills",
-      type: "multi-select",
-      component: "MultiSelect",
-      label: "Skills",
-      items: frameworksList, // List of frameworks
-      validation: {
-        required: "Select at least one skill",
-        min: 1,
-        max: 3,
-      },
-    },
-    {
-      name: "birthdate",
-      type: "date",
-      component: "DatePicker",
-      label: "Birthdate",
-      validation: {
-        required: "Please select your birthdate",
-      },
-    },
-    {
-      name: "framework",
-      type: "combobox",
-      component: "Combobox",
-      label: "Framework",
-      items: comboboxFrameworks, // Combobox frameworks
-      validation: {
-        required: "Please select a framework",
-      },
-    },
-    {
-      name: "username",
-      type: "text",
-      component: "Input",
-      label: "Username",
-      placeholder: "Enter your username",
-      validation: {
-        required: "Username is required",
-        minLength: {
-          value: 4,
-          message: "Username must be at least 4 characters",
-        },
-        maxLength: {
-          value: 12,
-          message: "Username cannot be more than 12 characters",
-        },
-      },
-    },
-    {
-      name: "bio",
-      type: "textarea",
-      component: "Textarea",
-      label: "Bio",
-      placeholder: "Tell us about yourself",
-      validation: {
-        required: "Bio is required",
-        minLength: {
-          value: 10,
-          message: "Bio must be at least 10 characters",
-        },
-      },
-    },
-  ],
-};
-
-const DynamicForm: FC = () => {
-  const schema = createSchema(formJson.fields);
+const DynamicForm: FC<DynamicFormProps> = ({ data, languge }) => {
+  const schema = createSchema(data);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    control,
   } = useForm({
     resolver: zodResolver(schema),
   });
 
+  const [selectedFramework, setSelectedFramework] = useState<string>("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [open, setOpen] = useState(false);
-  const [selectedFramework, setSelectedFramework] = useState("");
 
   const onSubmit = (data: any) => {
     console.log(data);
@@ -190,14 +82,41 @@ const DynamicForm: FC = () => {
 
   // Function to dynamically render components based on JSON config
   const renderComponent = (field: any) => {
+    const allowedCharacters = field.allowedCharacters || ""; // Get allowed characters from the field config
+
+    // Escape special characters in the allowedCharacters string, particularly the hyphen (-)
+    const escapeRegExp = (string: string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape regex special characters
+    };
+
+    const handleBeforeInput = (event: React.FormEvent<HTMLInputElement>) => {
+      const { data } = event as any;
+
+      // Escape hyphen (-) if it's part of the allowed characters
+      const escapedAllowedChars = escapeRegExp(allowedCharacters);
+
+      // Create a regex pattern to allow only specified characters
+      const regex = new RegExp(`^[${escapedAllowedChars}]*$`); // Corrected the pattern
+
+      // If the typed character doesn't match the allowed pattern, prevent the input
+      if (!regex.test(data)) {
+        event.preventDefault(); // Prevent the user from typing invalid characters
+      }
+    };
+
     switch (field.component) {
       case "Input":
         return (
           <Input
+            dir={languge === "ar" ? "rtl" : "ltr"}
             type={field.type}
             placeholder={field.placeholder}
             {...register(field.name)}
             className="border p-2 rounded-md"
+            maxLength={field.validation.maxLength?.value}
+            onBeforeInput={
+              field.allowedCharacters ? handleBeforeInput : undefined
+            }
           />
         );
       case "Textarea":
@@ -220,29 +139,13 @@ const DynamicForm: FC = () => {
             </label>
           </div>
         );
-      case "RadioGroup":
-        return (
-          <RadioGroup {...register(field.name)} className="space-y-4">
-            {field.items.map((item: any) => (
-              <div key={item.value} className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value={item.value}
-                  id={`${field.name}-${item.value}`}
-                />
-                <Label htmlFor={`${field.name}-${item.value}`}>
-                  {item.label}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        );
       case "MultiSelect":
         return (
           <MultiSelect
             options={field.items}
             onValueChange={setSelectedSkills}
             defaultValue={selectedSkills}
-            placeholder="Select your skills"
+            placeholder={field.placeholder}
             maxCount={field.validation.max}
           />
         );
@@ -254,23 +157,23 @@ const DynamicForm: FC = () => {
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className="w-[200px] justify-between"
+                className="w-[200px] justify-between text-muted-foreground"
               >
                 {selectedFramework
                   ? field.items.find((f: any) => f.value === selectedFramework)
                       ?.label
-                  : "Select framework..."}
-                <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  : field.placeholder}
+                <CaretSortIcon className="ms-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
+            <PopoverContent className="w-[200px] p-0 text-muted-foreground">
               <Command>
                 <CommandInput
-                  placeholder="Search framework..."
-                  className="h-9"
+                  placeholder={field.placeholder}
+                  className="h-9 "
                 />
                 <CommandList>
-                  <CommandEmpty>No framework found.</CommandEmpty>
+                  <CommandEmpty>No items found.</CommandEmpty>
                   <CommandGroup>
                     {field.items.map((framework: any) => (
                       <CommandItem
@@ -288,7 +191,7 @@ const DynamicForm: FC = () => {
                         {framework.label}
                         <CheckIcon
                           className={cn(
-                            "ml-auto h-4 w-4",
+                            "ms-auto h-4 w-4",
                             selectedFramework === framework.value
                               ? "opacity-100"
                               : "opacity-0"
@@ -304,32 +207,9 @@ const DynamicForm: FC = () => {
         );
       case "DatePicker":
         return (
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !selectedDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? (
-                  format(selectedDate, "PPP")
-                ) : (
-                  <span>Pick a date</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
+          <DateTimePickerV2
+            placeholder={languge === "ar" ? "اختر التاريخ" : "Select date"}
+          />
         );
       default:
         return null;
@@ -337,35 +217,76 @@ const DynamicForm: FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {formJson.fields.map((field) => (
-        <div key={field.name} className="flex flex-col">
-          <label htmlFor={field.name} className="font-medium">
-            {field.label}
-          </label>
-          {renderComponent(field)}
-          {errors[field.name] && (
-            <p className="text-red-500 text-sm">
-              {(errors as any)[field.name]?.message}
-            </p>
-          )}
-        </div>
-      ))}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+      <Accordion
+        type="multiple"
+        className="w-full"
+        defaultValue={data.map((_, index) => `item-${index}`)}
+      >
+        {data.map((section, index) => (
+          <AccordionItem key={index} value={`item-${index}`}>
+            {!section.notCollapsible ? (
+              <>
+                <AccordionTrigger>
+                  <div>
+                    <div
+                      className={`flex items-center pt-[6px] ${
+                        section.sectionIcon && "gap-x-2"
+                      }`}
+                    >
+                      <div>{section.sectionIcon}</div>
+                      <div>{section.sectionTitle}</div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+              </>
+            ) : (
+              <>
+                <div>
+                  <div
+                    className={`flex flex-1 items-center pt-[14px] text-sm font-medium transition-all  [&[data-state=open]>svg]:rotate-180 ${
+                      section.sectionIcon && "gap-x-2"
+                    }`}
+                  >
+                    <div>{section.sectionIcon}</div>
+                    <div>{section.sectionTitle}</div>
+                  </div>
+                </div>
+              </>
+            )}
+            <AccordionContent>
+              <p
+                className={`text-[12px] font-normal text-[#999] mt-[-4px] ${
+                  section.sectionIcon ? "ms-5" : "ms-0"
+                }`}
+              >
+                {section.sectionDescription}
+              </p>
+              <Separator className="mb-5 mt-3" />
+
+              {section.fields.map((field) => (
+                <div key={field.name} className="flex flex-col mb-4 mx-1">
+                  <label htmlFor={field.name} className="font-medium mb-1">
+                    {field.label}
+                  </label>
+                  {renderComponent(field)}
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-sm">
+                      {(errors as any)[field.name]?.message}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
       <button
         type="submit"
         className="bg-blue-500 text-white py-2 px-4 rounded-md"
       >
         Submit
       </button>
-
-      <div className="mt-4">
-        <h2 className="text-xl font-semibold">Selected Skills:</h2>
-        <ul className="list-disc list-inside">
-          {selectedSkills.map((skill) => (
-            <li key={skill}>{skill}</li>
-          ))}
-        </ul>
-      </div>
     </form>
   );
 };

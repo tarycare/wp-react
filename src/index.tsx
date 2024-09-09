@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "./components/theme-provider";
 import { ModeToggle } from "./components/mode-toggle";
@@ -14,7 +13,9 @@ import StaffDetails from "./pages/StaffDetails";
 import NotFound from "./components/NotFound";
 import App from "./app";
 import "./index.css";
-import DynamicForm from "./FormBuilder";
+import Home from "./pages/Home";
+import "../src/i18n";
+
 // Define routes for the app
 const routes: RouteObject[] = [
   {
@@ -22,7 +23,9 @@ const routes: RouteObject[] = [
     element: (
       <div>
         {/* <App /> */}
-        <DynamicForm />
+        <div className="w-[800px]">
+          <Home />
+        </div>
       </div>
     ),
   },
