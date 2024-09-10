@@ -6,6 +6,25 @@ function Home() {
 
   const lang = document.documentElement.dir === "rtl" ? "ar" : "en";
 
+  const handleSubmission = async (data: any) => {
+    console.log("Submitting form data:", data);
+    try {
+      // Send the form data to an API or handle it as needed
+      const response = await fetch("/api/submit-form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log("Form submitted successfully:", result);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+  };
+
   // Group the form fields into sections for Accordion
   const formSections = [
     {
@@ -152,6 +171,7 @@ function Home() {
   const formSectionsAr = [
     {
       sectionTitle: "المعلومات الشخصية",
+      sectionDescription: "أدخل معلوماتك الشخصية",
       sectionIcon: "👤",
       notCollapsible: true,
       fields: [
@@ -207,6 +227,8 @@ function Home() {
 
     {
       sectionTitle: "معلومات الموظف",
+      sectionDescription: "لأننا نهتم بمعرفة المزيد عنك",
+      sectionIcon: "👨‍💼",
       fields: [
         {
           name: "phone",
@@ -245,7 +267,7 @@ function Home() {
     },
     {
       sectionTitle: "المهارات والتفضيلات",
-      sectionDescription: "اختر الإطار والمهارات التي تمتلكها",
+      sectionDescription: "لأن المهارات تهمنا",
       sectionIcon: "🛠️",
       fields: [
         {
@@ -292,6 +314,7 @@ function Home() {
       <DynamicForm
         data={lang === "ar" ? formSectionsAr : formSections}
         languge={lang}
+        handleSubmission={handleSubmission}
       />
     </div>
   );

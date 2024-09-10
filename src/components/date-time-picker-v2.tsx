@@ -9,10 +9,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 export function DateTimePickerV2({
   selectedDate = () => {}, // Default to an empty function if not provided
-  placholder,
+  placeholder, // Corrected the typo here
 }: {
   selectedDate: (date: string) => void;
-  placholder: string;
+  placeholder: string; // Corrected the typo here
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
@@ -22,6 +22,7 @@ export function DateTimePickerV2({
       setDate(selected);
       const formattedDate = format(selected, "dd/MM/yyyy");
       selectedDate(formattedDate); // Pass the selected date back to the parent
+      setIsOpen(false); // Close the calendar after selecting a date
     }
   };
 
@@ -36,11 +37,12 @@ export function DateTimePickerV2({
                 "w-full font-normal flex items-center bg-white border cursor-pointer py-2 px-2 rounded-sm",
                 !date && "text-muted-foreground"
               )}
+              onClick={() => setIsOpen(true)} // Open the calendar when clicking the trigger
             >
               {date ? (
                 `${format(date, "dd/MM/yyyy")}`
               ) : (
-                <span>{placholder && placholder}</span>
+                <span>{placeholder && placeholder}</span> // Use placeholder correctly
               )}
               <CalendarIcon className="ms-auto h-4 w-4 opacity-50" />
             </div>
@@ -50,7 +52,7 @@ export function DateTimePickerV2({
               mode="single"
               captionLayout="dropdown"
               selected={date}
-              onSelect={handleDateChange}
+              onSelect={handleDateChange} // Call handleDateChange when a date is selected
               fromYear={1940}
               toYear={new Date().getFullYear()}
             />
