@@ -241,6 +241,7 @@ const DynamicForm: FC<DynamicFormProps> = ({
             selectedDate={(date) => {
               setValue(field.name, date); // Update form value
             }}
+            lang={languge}
           />
         );
 

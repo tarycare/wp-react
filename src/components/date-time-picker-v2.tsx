@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 export function DateTimePickerV2({
   selectedDate = () => {}, // Default to an empty function if not provided
   placeholder, // Corrected the typo here
+  lang = "en", // Default to "en" if not provided
 }: {
   selectedDate: (date: string) => void;
   placeholder: string; // Corrected the typo here
