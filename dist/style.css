@@ -735,20 +735,17 @@ body{
 .ml-1{
   margin-left: 0.25rem;
 }
+.ml-2{
+  margin-left: 0.5rem;
+}
 .ml-auto{
   margin-left: auto;
 }
 .mr-2{
   margin-right: 0.5rem;
 }
-.ms-0{
-  margin-inline-start: 0px;
-}
 .ms-2{
   margin-inline-start: 0.5rem;
-}
-.ms-5{
-  margin-inline-start: 1.25rem;
 }
 .ms-auto{
   margin-inline-start: auto;
@@ -771,8 +768,11 @@ body{
 .mt-8{
   margin-top: 2rem;
 }
-.mt-\[0px\]{
-  margin-top: 0px;
+.mt-\[2px\]{
+  margin-top: 2px;
+}
+.mt-\[4px\]{
+  margin-top: 4px;
 }
 .mt-auto{
   margin-top: auto;
@@ -1338,6 +1338,10 @@ body{
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity));
 }
+.bg-gray-300{
+  --tw-bg-opacity: 1;
+  background-color: rgb(209 213 219 / var(--tw-bg-opacity));
+}
 .bg-muted{
   background-color: hsl(var(--muted));
 }
@@ -1441,6 +1445,9 @@ body{
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 }
+.pb-0{
+  padding-bottom: 0px;
+}
 .pb-2{
   padding-bottom: 0.5rem;
 }
@@ -1489,12 +1496,6 @@ body{
 .pt-4{
   padding-top: 1rem;
 }
-.pt-\[14px\]{
-  padding-top: 14px;
-}
-.pt-\[6px\]{
-  padding-top: 6px;
-}
 .text-left{
   text-align: left;
 }
@@ -1518,9 +1519,6 @@ body{
 .text-\[0\.8rem\]{
   font-size: 0.8rem;
 }
-.text-\[12px\]{
-  font-size: 12px;
-}
 .text-base{
   font-size: 1rem;
   line-height: 1.5rem;
@@ -1536,9 +1534,6 @@ body{
 .text-xs{
   font-size: 0.75rem;
   line-height: 1rem;
-}
-.font-bold{
-  font-weight: 700;
 }
 .font-medium{
   font-weight: 500;
@@ -1564,10 +1559,6 @@ body{
 }
 .tracking-widest{
   letter-spacing: 0.1em;
-}
-.text-\[\#999\]{
-  --tw-text-opacity: 1;
-  color: rgb(153 153 153 / var(--tw-text-opacity));
 }
 .text-accent-foreground{
   color: hsl(var(--accent-foreground));
