@@ -56,6 +56,7 @@ export function DateTimePickerV2({
               onSelect={handleDateChange} // Call handleDateChange when a date is selected
               fromYear={1940}
               toYear={new Date().getFullYear()}
+              lang={lang}
             />
           </PopoverContent>
         </Popover>

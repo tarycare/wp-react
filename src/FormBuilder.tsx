@@ -1,12 +1,9 @@
 // @ts-nocheck
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,233 +15,229 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"; // Import Accordion components
-import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"; // For Combobox
+} from "@/components/ui/command";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 import { Separator } from "./components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
-// Dynamically create Zod schema based on the JSON structure
-const createSchema = (sections: any) => {
-  const schemaObject: any = {};
-  sections.forEach((section: any) => {
-    section.fields.forEach((field: any) => {
-      let validation;
+// Function to apply custom validation based on field configuration
+const applyValidation = (field: any) => {
+  const rules: any = {};
 
-      if (field.type === "multi-select") {
-        // MultiSelect returns an array, so validate it as an array
-        validation = z
-          .array(z.string()) // Each value in the array is a string
-          .min(field.validation?.min || 1, field.validation?.required) // Minimum number of selected items
-          .max(
-            field.validation?.max || 3,
-            `You can select up to ${field.validation?.max || 3} items`
-          );
-      } else {
-        // Default validation for string fields
-        validation = z.string();
-        if (field.validation?.required) {
-          validation = validation.nonempty(field.validation.required);
-        }
-        if (field.validation?.minLength) {
-          validation = validation.min(
-            field.validation.minLength.value,
-            field.validation.minLength.message
-          );
-        }
-        if (field.validation?.maxLength) {
-          validation = validation.max(
-            field.validation.maxLength.value,
-            field.validation.maxLength.message
-          );
-        }
-      }
+  if (field.required === "TRUE") {
+    rules.required = `${field.label_en || field.label_ar} is required`;
+  }
 
-      schemaObject[field.name] = validation;
-    });
-  });
-  return z.object(schemaObject);
+  if (field.min) {
+    rules.minLength = {
+      value: Number(field.min),
+      message: `${field.label_en || field.label_ar} must be at least ${
+        field.min
+      } characters`,
+    };
+  }
+
+  if (field.max) {
+    rules.maxLength = {
+      value: Number(field.max),
+      message: `${field.label_en || field.label_ar} must be no more than ${
+        field.max
+      } characters`,
+    };
+  }
+
+  return rules;
+};
+
+// Debounce function for performance improvement
+const debounce = (func: Function, delay: number) => {
+  let timeoutId: any;
+  return (...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
 };
 
 const DynamicForm: FC<DynamicFormProps> = ({
-  data,
+  data = { sections: [] }, // Default to an object with an empty sections array to avoid undefined error
   languge,
   handleSubmission,
-}: {
-  data: any;
-  languge: string;
-  handleSubmission: (data: any) => void;
 }) => {
-  const schema = createSchema(data);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm({
-    resolver: zodResolver(schema),
-  });
+    trigger,
+  } = useForm();
 
   const [selectedFramework, setSelectedFramework] = useState<string>("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const onSubmit = (data: any) => {
     handleSubmission(data);
   };
 
-  // Function to dynamically render components based on JSON config
+  const handleComboboxSelect = (currentValue: string, fieldName: string) => {
+    const updatedValue = currentValue === selectedFramework ? "" : currentValue;
+    setSelectedFramework(updatedValue);
+    setValue(fieldName, updatedValue);
+    debouncedTrigger(fieldName);
+  };
+
+  const debouncedTrigger = debounce(trigger, 300);
+
+  const handleMultiSelectChange = (values: string[], fieldName: string) => {
+    setSelectedSkills(values);
+    setValue(fieldName, values);
+    debouncedTrigger(fieldName);
+  };
+
   const renderComponent = (field: any) => {
-    const allowedCharacters = field.allowedCharacters || ""; // Get allowed characters from the field config
+    const label = languge === "ar" ? field.label_ar : field.label_en;
+    const placeholder =
+      languge === "ar" ? field.placeholder_ar : field.placeholder_en;
 
-    // Escape special characters in the allowedCharacters string, particularly the hyphen (-)
-    const escapeRegExp = (string: string) => {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape regex special characters
-    };
-
-    const handleBeforeInput = (event: React.FormEvent<HTMLInputElement>) => {
-      const { data } = event as any;
-
-      // Escape hyphen (-) if it's part of the allowed characters
-      const escapedAllowedChars = escapeRegExp(allowedCharacters);
-
-      // Create a regex pattern to allow only specified characters
-      const regex = new RegExp(`^[${escapedAllowedChars}]*$`); // Corrected the pattern
-
-      // If the typed character doesn't match the allowed pattern, prevent the input
-      if (!regex.test(data)) {
-        event.preventDefault(); // Prevent the user from typing invalid characters
-      }
-    };
-
-    switch (field.component) {
-      case "Input":
+    switch (field.type.toLowerCase()) {
+      case "text":
+      case "email":
+      case "phone":
+      case "number":
         return (
           <Input
-            dir={languge === "ar" ? "rtl" : "ltr"}
-            type={field.type}
-            placeholder={field.placeholder}
-            {...register(field.name)}
-            className="border p-2 rounded-md"
-            maxLength={field.validation.maxLength?.value}
-            onBeforeInput={
-              field.allowedCharacters ? handleBeforeInput : undefined
-            }
+            type={field.type.toLowerCase()}
+            placeholder={placeholder}
+            {...register(field.name, applyValidation(field))}
+            className="border p-2 rounded-md bg-background"
           />
         );
-      case "Textarea":
+      case "textarea":
         return (
           <Textarea
-            placeholder={field.placeholder}
-            {...register(field.name)}
-            className="border p-2 rounded-md"
+            placeholder={placeholder}
+            {...register(field.name, applyValidation(field))}
+            className="border p-2 rounded-md bg-background"
           />
         );
-      case "Checkbox":
+      case "checkbox":
         return (
           <div className="flex items-center space-x-2">
             <Checkbox id={field.name} {...register(field.name)} />
-            <label
-              htmlFor={field.name}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {field.label}
+            <label htmlFor={field.name} className="text-sm font-medium">
+              {label}
             </label>
           </div>
         );
-      case "MultiSelect":
+      case "radio":
+        return (
+          <div>
+            {field.items?.map((item: any) => (
+              <div key={item.value} className="flex items-center">
+                <input
+                  type="radio"
+                  value={item.value}
+                  {...register(field.name, applyValidation(field))}
+                />
+                <label className="ml-2">
+                  {languge === "ar" ? item.label_ar : item.label_en}
+                </label>
+              </div>
+            ))}
+          </div>
+        );
+      case "multi-select":
         return (
           <MultiSelect
             options={field.items}
-            onValueChange={(values) => {
-              setSelectedSkills(values);
-              setValue(field.name, values); // Update form value
-            }}
+            onValueChange={(values) =>
+              handleMultiSelectChange(values, field.name)
+            }
             defaultValue={selectedSkills}
-            placeholder={field.placeholder}
-            maxCount={field.validation.max}
+            placeholder={placeholder}
           />
         );
-
-      case "Combobox":
-        return (
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-[200px] justify-between text-muted-foreground"
-              >
-                {selectedFramework
-                  ? field.items.find((f: any) => f.value === selectedFramework)
-                      ?.label
-                  : field.placeholder}
-                <CaretSortIcon className="ms-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0 text-muted-foreground">
-              <Command>
-                <CommandInput
-                  placeholder={field.placeholder}
-                  className="h-9 "
-                />
-                <CommandList>
-                  <CommandEmpty>No items found.</CommandEmpty>
-                  <CommandGroup>
-                    {field.items.map((framework: any) => (
-                      <CommandItem
-                        key={framework.value}
-                        value={framework.value}
-                        onSelect={(currentValue) => {
-                          setSelectedFramework(
-                            currentValue === selectedFramework
-                              ? ""
-                              : currentValue
-                          );
-                          setValue(field.name, currentValue); // Update form value
-                          setOpen(false);
-                        }}
-                      >
-                        {framework.label}
-                        <CheckIcon
-                          className={cn(
-                            "ms-auto h-4 w-4",
-                            selectedFramework === framework.value
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        );
-      case "DatePicker":
+      case "date":
         return (
           <DateTimePickerV2
-            placeholder={languge === "ar" ? "اختر التاريخ" : "Select date"}
+            placeholder={placeholder}
             selectedDate={(date) => {
-              setValue(field.name, date); // Update form value
+              setSelectedDate(date);
+              setValue(field.name, date);
+              debouncedTrigger(field.name);
             }}
-            lang={languge}
           />
         );
-
+      case "select":
+        return (
+          <>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-[200px] justify-between text-muted-foreground"
+                >
+                  {selectedFramework
+                    ? field.items.find(
+                        (f: any) => f.value === selectedFramework
+                      )?.label
+                    : placeholder}
+                  <CaretSortIcon className="ms-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0 text-muted-foreground">
+                <Command>
+                  <CommandInput placeholder={placeholder} className="h-9" />
+                  <CommandList>
+                    <CommandEmpty>No items found.</CommandEmpty>
+                    <CommandGroup>
+                      {field.items?.map((item: any) => (
+                        <CommandItem
+                          key={item.value}
+                          value={item.value}
+                          onSelect={() =>
+                            handleComboboxSelect(item.value, field.name)
+                          }
+                        >
+                          {languge === "ar" ? item.label_ar : item.label_en}
+                          <CheckIcon
+                            className={cn(
+                              "ms-auto h-4 w-4",
+                              selectedFramework === item.value
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {errors[field.name] && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors[field.name]?.message}
+              </p>
+            )}
+          </>
+        );
       default:
         return null;
     }
@@ -255,72 +248,66 @@ const DynamicForm: FC<DynamicFormProps> = ({
       <Accordion
         type="multiple"
         className="w-full"
-        defaultValue={data.map((_, index) => `item-${index}`)}
+        defaultValue={[
+          `item-0`,
+          `item-1`,
+          `item-2`,
+          `item-3`,
+          `item-4`,
+          `item-5`,
+          `item-6`,
+          `item-7`,
+          `item-8`,
+          `item-9`,
+        ]}
       >
-        {data.map((section, index) => (
-          <AccordionItem key={index} value={`item-${index}`}>
-            {!section.notCollapsible ? (
-              <>
-                <AccordionTrigger>
+        {data?.map(
+          (
+            section,
+            index // Optional chaining for data and sections
+          ) => (
+            <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionTrigger>
+                <div className="flex items-center gap-x-2 py-2 pb-0">
+                  <div>{section.section_icon}</div>
                   <div>
-                    <div
-                      className={`flex items-center pt-[6px] ${
-                        section.sectionIcon && "gap-x-2"
-                      }`}
-                    >
-                      <div>{section.sectionIcon}</div>
-                      <div>{section.sectionTitle}</div>
-                    </div>
-                  </div>
-                </AccordionTrigger>
-              </>
-            ) : (
-              <>
-                <div>
-                  <div
-                    className={`flex flex-1 items-center pt-[14px] text-sm font-medium transition-all  [&[data-state=open]>svg]:rotate-180 ${
-                      section.sectionIcon && "gap-x-2"
-                    }`}
-                  >
-                    <div>{section.sectionIcon}</div>
-                    <div className="font-bold">{section.sectionTitle}</div>
+                    {languge === "ar"
+                      ? section.section_label_ar
+                      : section.section_label_en}
                   </div>
                 </div>
-              </>
-            )}
-            <AccordionContent>
-              <p
-                className={`text-[12px] font-normal text-[#999] mt-[0px] ${
-                  section.sectionIcon ? "ms-5" : "ms-0"
-                }`}
-              >
-                {section.sectionDescription}
-              </p>
-              <Separator className="my-2" />
-
-              {section.fields.map((field) => (
-                <div key={field.name} className="flex flex-col mb-4 mx-1">
-                  <label htmlFor={field.name} className="font-medium mb-1">
-                    {field.label}
-                  </label>
-                  {renderComponent(field)}
-                  {errors[field.name] && (
-                    <p className="text-red-500 text-sm">
-                      {(errors as any)[field.name]?.message}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+              </AccordionTrigger>
+              <AccordionContent>
+                <p className="text-sm font-normal text-gray-500 mt-[2px]">
+                  {languge === "ar"
+                    ? section.section_description_ar
+                    : section.section_description_en}
+                </p>
+                <Separator className="mb-4 mt-2 bg-gray-300" />
+                {section.Fields?.map((field) => (
+                  <div key={field.name} className="flex flex-col mb-4 mx-1">
+                    <Label htmlFor={field.name} className="font-medium mb-1">
+                      {languge === "ar" ? field.label_ar : field.label_en}
+                    </Label>
+                    {renderComponent(field)}
+                    {errors[field.name] && (
+                      <p className="text-red-500 text-sm mt-[4px]">
+                        {errors[field.name]?.message}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+          )
+        )}
       </Accordion>
-      <button
+      <Button
         type="submit"
         className="bg-blue-500 text-white py-2 px-4 rounded-md"
       >
         Submit
-      </button>
+      </Button>
     </form>
   );
 };

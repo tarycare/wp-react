@@ -14,7 +14,6 @@ import NotFound from "./components/NotFound";
 import App from "./app";
 import "./index.css";
 import Home from "./pages/Home";
-import "../src/i18n";
 
 // Define routes for the app
 const routes: RouteObject[] = [
