@@ -195,8 +195,10 @@ const DynamicForm: FC<DynamicFormProps> = ({
                 >
                   {selectedFramework
                     ? field.items.find(
-                        (f: any) => f.value === selectedFramework
-                      )?.label
+                        languge === "ar"
+                          ? (f: any) => f.value === selectedFramework
+                          : (f: any) => f.value === selectedFramework
+                      )[languge === "ar" ? "label_ar" : "label_en"]
                     : placeholder}
                   <CaretSortIcon className="ms-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -286,7 +288,7 @@ const DynamicForm: FC<DynamicFormProps> = ({
                 <Separator className="mb-4 mt-2 bg-gray-300" />
                 {section.Fields?.map((field) => (
                   <div key={field.name} className="flex flex-col mb-4 mx-1">
-                    <Label htmlFor={field.name} className="font-medium mb-1">
+                    <Label htmlFor={field.name} className="font-medium mb-2">
                       {languge === "ar" ? field.label_ar : field.label_en}
                     </Label>
                     {renderComponent(field)}
