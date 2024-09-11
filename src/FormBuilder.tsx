@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DateTimePickerV2 } from "@/components/date-time-picker-v2";
 import {
@@ -23,7 +22,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { Separator } from "./components/ui/separator";
 import {
   Accordion,
   AccordionContent,
@@ -35,7 +33,7 @@ import {
 const applyValidation = (field: any) => {
   const rules: any = {};
 
-  if (field.required === "TRUE") {
+  if (field.required) {
     rules.required = `${field.label_en || field.label_ar} is required`;
   }
 
@@ -60,7 +58,6 @@ const applyValidation = (field: any) => {
   return rules;
 };
 
-// Debounce function for performance improvement
 const debounce = (func: Function, delay: number) => {
   let timeoutId: any;
   return (...args: any[]) => {
@@ -84,27 +81,31 @@ const DynamicForm: FC<DynamicFormProps> = ({
     trigger,
   } = useForm();
 
-  const [selectedFramework, setSelectedFramework] = useState<string>("");
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  // Dynamic state for form fields
+  const [formState, setFormState] = useState<{ [key: string]: any }>({});
+
+  const debouncedTrigger = debounce(trigger, 300);
 
   const onSubmit = (data: any) => {
     handleSubmission(data);
   };
 
-  const handleComboboxSelect = (currentValue: string, fieldName: string) => {
-    const updatedValue = currentValue === selectedFramework ? "" : currentValue;
-    setSelectedFramework(updatedValue);
-    setValue(fieldName, updatedValue);
+  // Dynamic field state handler
+  const handleFieldChange = (fieldName: string, value: any) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
+    setValue(fieldName, value);
     debouncedTrigger(fieldName);
   };
-
-  const debouncedTrigger = debounce(trigger, 300);
-
-  const handleMultiSelectChange = (values: string[], fieldName: string) => {
-    setSelectedSkills(values);
-    setValue(fieldName, values);
+  // Dynamic field state handler
+  const handleSelectChange = (fieldName: string, value: any, item: any) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [fieldName]: languge === "ar" ? item.label_ar : item.label_en,
+    }));
+    setValue(fieldName, value);
     debouncedTrigger(fieldName);
   };
 
@@ -117,11 +118,23 @@ const DynamicForm: FC<DynamicFormProps> = ({
       case "text":
       case "email":
       case "phone":
-      case "number":
         return (
           <Input
             type={field.type.toLowerCase()}
             placeholder={placeholder}
+            value={formState[field.name] || ""}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+            {...register(field.name, applyValidation(field))}
+            className="border p-2 rounded-md bg-background"
+          />
+        );
+      case "number":
+        return (
+          <Input
+            type="text"
+            placeholder={placeholder}
+            value={formState[field.name] || ""}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
             {...register(field.name, applyValidation(field))}
             className="border p-2 rounded-md bg-background"
           />
@@ -130,6 +143,8 @@ const DynamicForm: FC<DynamicFormProps> = ({
         return (
           <Textarea
             placeholder={placeholder}
+            value={formState[field.name] || ""}
+            onChange={(e) => handleFieldChange(field.name, e.target.value)}
             {...register(field.name, applyValidation(field))}
             className="border p-2 rounded-md bg-background"
           />
@@ -137,7 +152,14 @@ const DynamicForm: FC<DynamicFormProps> = ({
       case "checkbox":
         return (
           <div className="flex items-center space-x-2">
-            <Checkbox id={field.name} {...register(field.name)} />
+            <Checkbox
+              id={field.name}
+              checked={formState[field.name] || false}
+              onCheckedChange={(checked) =>
+                handleFieldChange(field.name, checked)
+              }
+              {...register(field.name)}
+            />
             <label htmlFor={field.name} className="text-sm font-medium">
               {label}
             </label>
@@ -151,23 +173,27 @@ const DynamicForm: FC<DynamicFormProps> = ({
                 <input
                   type="radio"
                   value={item.value}
+                  checked={formState[field.name] === item.value}
+                  onChange={() => handleFieldChange(field.name, item.value)}
                   {...register(field.name, applyValidation(field))}
                 />
-                <label className="ml-2">
+                <label className="ms-2">
                   {languge === "ar" ? item.label_ar : item.label_en}
                 </label>
               </div>
             ))}
           </div>
         );
-      case "multi-select":
+      case "multiselect":
         return (
           <MultiSelect
-            options={field.items}
-            onValueChange={(values) =>
-              handleMultiSelectChange(values, field.name)
-            }
-            defaultValue={selectedSkills}
+            options={field.items.map((item) => ({
+              value: item.value,
+              label_en: item.label_en,
+              label_ar: item.label_ar,
+            }))}
+            onValueChange={(values) => handleFieldChange(field.name, values)}
+            defaultValue={formState[field.name] || []}
             placeholder={placeholder}
           />
         );
@@ -175,31 +201,20 @@ const DynamicForm: FC<DynamicFormProps> = ({
         return (
           <DateTimePickerV2
             placeholder={placeholder}
-            selectedDate={(date) => {
-              setSelectedDate(date);
-              setValue(field.name, date);
-              debouncedTrigger(field.name);
-            }}
+            selectedDate={(date) => handleFieldChange(field.name, date)}
           />
         );
       case "select":
         return (
           <>
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   role="combobox"
-                  aria-expanded={open}
                   className="w-[200px] justify-between text-muted-foreground"
                 >
-                  {selectedFramework
-                    ? field.items.find(
-                        languge === "ar"
-                          ? (f: any) => f.value === selectedFramework
-                          : (f: any) => f.value === selectedFramework
-                      )[languge === "ar" ? "label_ar" : "label_en"]
-                    : placeholder}
+                  {formState[field.name] || placeholder}
                   <CaretSortIcon className="ms-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -214,17 +229,16 @@ const DynamicForm: FC<DynamicFormProps> = ({
                           key={item.value}
                           value={item.value}
                           onSelect={() =>
-                            handleComboboxSelect(item.value, field.name)
+                            handleSelectChange(field.name, item.value, item)
                           }
                         >
                           {languge === "ar" ? item.label_ar : item.label_en}
                           <CheckIcon
-                            className={cn(
-                              "ms-auto h-4 w-4",
-                              selectedFramework === item.value
+                            className={`ms-auto h-4 w-4 ${
+                              formState[field.name] === item.value
                                 ? "opacity-100"
                                 : "opacity-0"
-                            )}
+                            }`}
                           />
                         </CommandItem>
                       ))}
@@ -251,58 +265,47 @@ const DynamicForm: FC<DynamicFormProps> = ({
         type="multiple"
         className="w-full"
         defaultValue={[
-          `item-0`,
-          `item-1`,
-          `item-2`,
-          `item-3`,
-          `item-4`,
-          `item-5`,
-          `item-6`,
-          `item-7`,
-          `item-8`,
-          `item-9`,
+          "item-1",
+          "item-2",
+          "item-3",
+          "item-0",
+          "item-4",
+          "item-5",
+          "item-6",
+          "item-7",
+          "item-8",
+          "item-9",
         ]}
       >
-        {data?.map(
-          (
-            section,
-            index // Optional chaining for data and sections
-          ) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger>
-                <div className="flex items-center gap-x-2 py-2 pb-0">
-                  <div>{section.section_icon}</div>
-                  <div>
-                    {languge === "ar"
-                      ? section.section_label_ar
-                      : section.section_label_en}
-                  </div>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm font-normal text-gray-500 mt-[2px]">
+        {data?.map((section, index) => (
+          <AccordionItem key={index} value={`item-${index}`}>
+            <AccordionTrigger>
+              <div className="flex items-center gap-x-2 py-2 pb-0">
+                <div>{section.section_icon}</div>
+                <div>
                   {languge === "ar"
-                    ? section.section_description_ar
-                    : section.section_description_en}
-                </p>
-                <Separator className="mb-4 mt-2 bg-gray-300" />
-                {section.Fields?.map((field) => (
-                  <div key={field.name} className="flex flex-col mb-4 mx-1">
-                    <Label htmlFor={field.name} className="font-medium mb-2">
-                      {languge === "ar" ? field.label_ar : field.label_en}
-                    </Label>
-                    {renderComponent(field)}
-                    {errors[field.name] && (
-                      <p className="text-red-500 text-sm mt-[4px]">
-                        {errors[field.name]?.message}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-          )
-        )}
+                    ? section.section_label_ar
+                    : section.section_label_en}
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              {section.Fields?.map((field) => (
+                <div key={field.name} className="flex flex-col mb-4 mx-1">
+                  <Label htmlFor={field.name} className="font-medium mb-2">
+                    {languge === "ar" ? field.label_ar : field.label_en}
+                  </Label>
+                  {renderComponent(field)}
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-sm mt-2">
+                      {errors[field.name]?.message}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
       </Accordion>
       <Button
         type="submit"
