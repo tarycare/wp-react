@@ -717,6 +717,9 @@ body{
 .mb-1{
   margin-bottom: 0.25rem;
 }
+.mb-2{
+  margin-bottom: 0.5rem;
+}
 .mb-3{
   margin-bottom: 0.75rem;
 }
@@ -734,9 +737,6 @@ body{
 }
 .ml-1{
   margin-left: 0.25rem;
-}
-.ml-2{
-  margin-left: 0.5rem;
 }
 .ml-auto{
   margin-left: auto;
@@ -767,12 +767,6 @@ body{
 }
 .mt-8{
   margin-top: 2rem;
-}
-.mt-\[2px\]{
-  margin-top: 2px;
-}
-.mt-\[4px\]{
-  margin-top: 4px;
 }
 .mt-auto{
   margin-top: auto;
@@ -1337,10 +1331,6 @@ body{
 .bg-gray-100{
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity));
-}
-.bg-gray-300{
-  --tw-bg-opacity: 1;
-  background-color: rgb(209 213 219 / var(--tw-bg-opacity));
 }
 .bg-muted{
   background-color: hsl(var(--muted));
